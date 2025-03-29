@@ -79,7 +79,7 @@
       background: #444;
     }
 
-    /* === Body container for each tab’s content === */
+    /* === Body container for each tab's content === */
     .tab-content {
       flex: 1;
       margin: 0.5rem;
@@ -127,6 +127,7 @@
       padding: 0.5rem;
       cursor: pointer;
       user-select: none;
+      position: relative;
     }
     .quick-link:focus {
       outline: 2px solid #888;
@@ -143,6 +144,7 @@
       margin-bottom: 0.25rem;
     }
     .quick-link img {
+      width: 24;
       max-width: 100%;
       max-height: 100%;
       border-radius: 50%;
@@ -153,6 +155,14 @@
     .customise-btn {
       margin-top: 1rem;
       background: #444;
+    }
+    .add-link-btn {
+      margin-top: 1rem;
+      background: #555;
+      display: none;
+    }
+    .add-link-btn.edit-mode {
+      display: block;
     }
 
     /* Dragging Styles (while in edit mode) */
@@ -167,6 +177,24 @@
     }
     .drop-zone.edit-mode {
       display: block;
+    }
+    .quick-link .remove-icon {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ff4444;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .quick-link.edit-mode .remove-icon {
+      display: flex;
     }
 
     /* Skeleton Loading Animation */
@@ -298,7 +326,7 @@
   <!-- 1. Saved Tab -->
   <div class="tab-content active" id="savedTab">
     <div class="saved-content">
-      <!-- The “SVG Logo” area -->
+      <!-- The "SVG Logo" area -->
       <div class="saved-logo" id="savedLogo" tabindex="-1">
         SVG Logo
       </div>
@@ -317,6 +345,12 @@
       <button class="customise-btn" id="customiseBtn" tabindex="4">
         <span class="material-symbols-outlined" style="vertical-align:middle;">edit</span>
         Customise
+      </button>
+      
+      <!-- Add link button (visible only in edit mode) -->
+      <button class="add-link-btn" id="addLinkBtn">
+        <span class="material-symbols-outlined" style="vertical-align:middle;">add</span>
+        Add Link
       </button>
     </div>
   </div>
@@ -428,7 +462,7 @@ document.addEventListener('keydown', (e) => {
     // Keycode 90 pressed (Android fast-forward)
     // We can run a special function if an element is focused
     const focused = document.activeElement;
-    if (focused && focused.dataset && focused.dataset.link) {
+    if (focused && focused.dataset && focused.dataset.link && !editMode) {
       // If the item has a data-link, handle fast-forward action
       handleItemSelect('fastForward', focused.dataset.link);
     }
@@ -502,43 +536,61 @@ function loadQuickLinks(apiUrl) {
 
     // Mock data
     const data = [
-      { name: 'Google', link: 'https://google.com', icon: 'https://www.google.com/favicon.ico' },
-      { name: 'GitHub', link: 'https://github.com', icon: 'https://github.githubassets.com/favicons/favicon.png' },
-      { name: 'Stack', link: 'https://stackoverflow.com', icon: 'https://stackoverflow.com/favicon.ico' },
-      { name: 'Reddit', link: 'https://reddit.com', icon: 'https://www.redditstatic.com/desktop2x/img/favicon/favicon-32x32.png' },
+      { name: 'Google', link: 'https://google.com'},
+      { name: 'GitHub', link: 'https://github.com'},
+      { name: 'Stack', link: 'https://stackoverflow.com'},
+      { name: 'Reddit', link: 'https://reddit.com'},
     ];
 
     data.forEach((item, index) => {
-      const ql = document.createElement('div');
-      ql.classList.add('quick-link');
-      ql.tabIndex = 5 + index; // set tab index (just an example)
-      ql.draggable = false; // will enable in edit mode
-      ql.dataset.link = item.link; // store the link for DPAD / fastForward usage
-
-      // Icon container
-      const iconCont = document.createElement('div');
-      iconCont.classList.add('icon-container');
-      const iconImg = document.createElement('img');
-      iconImg.src = item.icon;
-      iconCont.appendChild(iconImg);
-
-      // Text
-      const textDiv = document.createElement('div');
-      textDiv.classList.add('ql-text');
-      textDiv.textContent = item.name;
-
-      // Build structure
-      ql.appendChild(iconCont);
-      ql.appendChild(textDiv);
-
-      // Handle normal click
-      ql.addEventListener('click', () => {
-        handleItemSelect('click', item.link);
-      });
-
-      quickLinksContainer.appendChild(ql);
+      renderQuickLink(item, index);
     });
   }, 1000);
+}
+
+function renderQuickLink(item, index) {
+  const quickLinksContainer = document.getElementById('quickLinks');
+  const ql = document.createElement('div');
+  ql.classList.add('quick-link');
+  ql.tabIndex = 5 + index; // set tab index (just an example)
+  ql.draggable = false; // will enable in edit mode
+  ql.dataset.link = item.link; // store the link for DPAD / fastForward usage
+
+  // Icon container
+  const iconCont = document.createElement('div');
+  iconCont.classList.add('icon-container');
+  const iconImg = document.createElement('img');
+  let urlObj = new URL(item.link);
+  iconImg.src = `https://www.google.com/s2/favicons?domain=${urlObj.hostname}`;
+  iconCont.appendChild(iconImg);
+
+  // Text
+  const textDiv = document.createElement('div');
+  textDiv.classList.add('ql-text');
+  textDiv.textContent = item.name;
+
+  // Remove icon (visible in edit mode)
+  const removeIcon = document.createElement('div');
+  removeIcon.classList.add('remove-icon');
+  removeIcon.innerHTML = '×';
+  removeIcon.addEventListener('click', (e) => {
+    e.stopPropagation();
+    ql.remove();
+  });
+
+  // Build structure
+  ql.appendChild(iconCont);
+  ql.appendChild(textDiv);
+  ql.appendChild(removeIcon);
+
+  // Handle normal click
+  ql.addEventListener('click', () => {
+    if (!editMode) {
+      handleItemSelect('click', item.link);
+    }
+  });
+
+  quickLinksContainer.appendChild(ql);
 }
 
 /* ===========================================================
@@ -626,6 +678,7 @@ function handleItemSelect(eventType, link) {
    Edit / Customize Mode for Quick Links
    =========================================================== */
 const customiseBtn = document.getElementById('customiseBtn');
+const addLinkBtn = document.getElementById('addLinkBtn');
 const quickLinksContainer = document.getElementById('quickLinks');
 const dropZone = document.getElementById('dropZone');
 
@@ -635,80 +688,136 @@ let draggedItem = null;
 customiseBtn.addEventListener('click', () => {
   editMode = !editMode;
   if (editMode) {
-    customiseBtn.textContent = 'Done';
+    customiseBtn.innerHTML = '<span class="material-symbols-outlined" style="vertical-align:middle;">check</span> Done';
     enableEditMode();
   } else {
-    customiseBtn.textContent = 'Customise';
+    customiseBtn.innerHTML = '<span class="material-symbols-outlined" style="vertical-align:middle;">edit</span> Customise';
     disableEditMode();
     // TODO: POST updated order to API, if needed
   }
 });
 
+addLinkBtn.addEventListener('click', () => {
+  // Mock adding a new link
+  const newLink = {
+    name: 'New Link',
+    link: 'https://example.com/new',
+    icon: 'https://via.placeholder.com/32?text=New'
+  };
+  renderQuickLink(newLink, document.querySelectorAll('.quick-link').length);
+  
+  // Make sure the new link is properly set up for edit mode
+  const newElement = quickLinksContainer.lastElementChild;
+  newElement.draggable = true;
+  newElement.style.cursor = 'grab';
+  newElement.classList.add('edit-mode');
+  setupDragEvents(newElement);
+});
+
 function enableEditMode() {
   // Show dropZone or any instructions
   dropZone.classList.add('edit-mode');
-  // Make quick-links draggable
+  addLinkBtn.classList.add('edit-mode');
+  
+  // Make quick-links draggable and add edit mode styles
   Array.from(quickLinksContainer.children).forEach(linkEl => {
     linkEl.draggable = true;
     linkEl.style.cursor = 'grab';
-    linkEl.addEventListener('dragstart', onDragStart);
-    linkEl.addEventListener('dragend', onDragEnd);
-    linkEl.addEventListener('dragover', onDragOver);
-    linkEl.addEventListener('drop', onDrop);
+    linkEl.classList.add('edit-mode');
+    setupDragEvents(linkEl);
   });
+  
+  // Add dragover listener to the container
+  quickLinksContainer.addEventListener('dragover', handleContainerDragOver);
+}
+
+function setupDragEvents(linkEl) {
+  linkEl.addEventListener('dragstart', onDragStart);
+  linkEl.addEventListener('dragend', onDragEnd);
 }
 
 function disableEditMode() {
   dropZone.classList.remove('edit-mode');
+  addLinkBtn.classList.remove('edit-mode');
+  
+  // Remove edit mode from links
   Array.from(quickLinksContainer.children).forEach(linkEl => {
     linkEl.draggable = false;
     linkEl.style.cursor = 'pointer';
+    linkEl.classList.remove('edit-mode');
     linkEl.removeEventListener('dragstart', onDragStart);
     linkEl.removeEventListener('dragend', onDragEnd);
-    linkEl.removeEventListener('dragover', onDragOver);
-    linkEl.removeEventListener('drop', onDrop);
   });
+  
+  // Remove container listeners
+  quickLinksContainer.removeEventListener('dragover', handleContainerDragOver);
 }
 
 function onDragStart(e) {
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', null); // Required for Firefox
+  
   draggedItem = this;
   this.classList.add('dragging');
+  
+  // Small delay so the dragging visual effect works
+  setTimeout(() => {
+    this.style.opacity = '0.5';
+  }, 0);
 }
 
 function onDragEnd(e) {
-  draggedItem = null;
+  this.style.opacity = '1';
   this.classList.remove('dragging');
+  draggedItem = null;
+  
+  // Remove any temporary placeholders
+  const placeholders = document.querySelectorAll('.placeholder');
+  placeholders.forEach(el => el.remove());
 }
 
-function onDragOver(e) {
+function handleContainerDragOver(e) {
   e.preventDefault();
-  const afterElement = getDragAfterElement(quickLinksContainer, e.clientY);
-  if (!afterElement) {
+  e.stopPropagation();
+  
+  if (!draggedItem) return;
+  
+  // Get the element under the cursor
+  const afterElement = getDragAfterElement(quickLinksContainer, e.clientX, e.clientY);
+  
+  if (afterElement === null) {
     quickLinksContainer.appendChild(draggedItem);
-  } else {
+  } else if (afterElement !== draggedItem) {
     quickLinksContainer.insertBefore(draggedItem, afterElement);
   }
 }
 
-function onDrop(e) {
-  e.preventDefault();
-}
-
 /**
  * Helper to figure out the correct place to drop the dragged item.
+ * Fixed to work with any element position, not just start/end.
  */
-function getDragAfterElement(container, y) {
+function getDragAfterElement(container, x, y) {
+  // Get all the draggable elements that aren't currently being dragged
   const draggableElements = [...container.querySelectorAll('.quick-link:not(.dragging)')];
+  
+  // Find the closest element based on mouse position
   return draggableElements.reduce((closest, child) => {
     const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-    if (offset < 0 && offset > closest.offset) {
-      return { offset: offset, element: child };
-    } else {
-      return closest;
-    }
-  }, { offset: Number.NEGATIVE_INFINITY }).element;
+    const centerX = box.left + box.width / 2;
+    const centerY = box.top + box.height / 2;
+    
+    // Calculate distance from mouse to center of element
+    const offsetX = x - centerX;
+    const offsetY = y - centerY;
+    const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+    
+    // Return the closest element
+    return (distance < closest.distance) ? 
+      { distance: distance, element: child } : 
+      closest;
+  }, { distance: Number.POSITIVE_INFINITY }).element;
 }
+
 </script>
 
 </body>
