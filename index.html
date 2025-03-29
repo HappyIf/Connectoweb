@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Dark Themed Web App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google Material Icons -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
   <style>
     /* === Global Styles === */
@@ -17,6 +19,7 @@
       --skeleton-color: #2a2a2a;
       --skeleton-highlight: #3a3a3a;
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -24,6 +27,7 @@
       outline: none;
       font-family: sans-serif;
     }
+
     body {
       background-color: var(--bg-color);
       color: var(--fg-color);
@@ -34,7 +38,10 @@
       /* For DPAD testing, ensure focus ring is visible: */
       /* Outline only on keyboard navigation (optional) */
     }
-    button, a, input {
+
+    button,
+    a,
+    input {
       color: var(--fg-color);
       background: var(--accent-color);
       border: none;
@@ -42,10 +49,17 @@
       padding: 0.5rem 1rem;
       cursor: pointer;
     }
+
     button:focus,
     [tabindex]:focus {
-      outline: 2px solid #888;
+      /* outline: 2px solid #888; */
+      transform: scale(1.3); /* Slightly zoom in */
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Add a subtle elevation effect */
+      transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Smooth transition for the effects */
     }
+    
+
+
 
     /* === Container for the entire app === */
     .app-container {
@@ -59,13 +73,15 @@
     /* === Tabs Bar === */
     .tabs {
       display: flex;
-      justify-content: flex-start;
+      justify-content: space-between;
+      /* Distribute buttons evenly */
       background: var(--accent-color);
       padding: 0.5rem;
       border-radius: var(--border-radius);
       margin: 0.5rem;
       gap: 0.5rem;
     }
+
     .tab-button {
       flex: 0 0 auto;
       border-radius: var(--border-radius);
@@ -75,6 +91,7 @@
       border: none;
       cursor: pointer;
     }
+
     .tab-button.active {
       background: #444;
     }
@@ -86,21 +103,24 @@
       background: var(--accent-color);
       border-radius: var(--border-radius);
       padding: 1rem;
-      display: none; /* hidden by default */
+      display: none;
+      /* hidden by default */
     }
+
     .tab-content.active {
       display: block;
     }
 
     /* ================================
-       SAVED TAB
-       ================================ */
+            SAVED TAB
+            ================================ */
     .saved-content {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1rem;
     }
+
     .saved-logo {
       margin-top: 1rem;
       font-size: 2rem;
@@ -112,6 +132,7 @@
       justify-content: center;
       border-radius: var(--border-radius);
     }
+
     .quick-links {
       display: flex;
       flex-wrap: wrap;
@@ -119,6 +140,7 @@
       gap: 1rem;
       margin: 1rem 0;
     }
+
     .quick-link {
       width: 80px;
       text-align: center;
@@ -129,9 +151,12 @@
       user-select: none;
       position: relative;
     }
+
     .quick-link:focus {
-      outline: 2px solid #888;
+      /* outline: 2px solid #888; */
+      
     }
+
     .quick-link .icon-container {
       width: 40px;
       height: 40px;
@@ -143,24 +168,29 @@
       justify-content: center;
       margin-bottom: 0.25rem;
     }
+
     .quick-link img {
       width: 24;
       max-width: 100%;
       max-height: 100%;
       border-radius: 50%;
     }
+
     .quick-link .ql-text {
       font-size: 0.75rem;
     }
+
     .customise-btn {
       margin-top: 1rem;
       background: #444;
     }
+
     .add-link-btn {
       margin-top: 1rem;
       background: #555;
       display: none;
     }
+
     .add-link-btn.edit-mode {
       display: block;
     }
@@ -169,15 +199,18 @@
     .quick-link.dragging {
       opacity: 0.5;
     }
+
     .drop-zone {
       border: 2px dashed #666;
       margin: 1rem;
       padding: 1rem;
       display: none;
     }
+
     .drop-zone.edit-mode {
       display: block;
     }
+
     .quick-link .remove-icon {
       position: absolute;
       top: -5px;
@@ -193,6 +226,7 @@
       cursor: pointer;
       z-index: 5;
     }
+
     .quick-link.edit-mode .remove-icon {
       display: flex;
     }
@@ -202,14 +236,17 @@
       0% {
         background-color: var(--skeleton-color);
       }
+
       100% {
         background-color: var(--skeleton-highlight);
       }
     }
+
     .skeleton {
       border-radius: var(--border-radius);
       animation: skeleton-loading 1s linear infinite alternate;
     }
+
     /* Skeleton placeholders for quick links (Saved tab) */
     .quick-link.skeleton {
       width: 80px;
@@ -217,22 +254,27 @@
     }
 
     /* ================================
-       LIVE TAB
-       ================================ */
+            LIVE TAB
+            ================================ */
     .live-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
+      gap: 5rem;
     }
+
     .live-tile {
       background: #333;
       border-radius: var(--border-radius);
       padding: 0.5rem;
       cursor: pointer;
+      max-width: 250px;
     }
+
     .live-tile:focus {
-      outline: 2px solid #888;
+      /* outline: 2px solid #888; */
+      
     }
+
     .live-tile-img {
       width: 100%;
       height: 100px;
@@ -244,22 +286,66 @@
       align-items: center;
       justify-content: center;
     }
+
+
     .live-tile-img img {
       width: 100%;
       height: auto;
+      /* Blur effect */
+      filter: blur(10px);
+      -webkit-filter: blur(10px);
+      /* For Safari */
     }
+
+    .live-tile-img {
+      position: relative;
+    }
+
+    .live-tile-img .device-info {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+
+      font-size: 12px;
+      font-weight: bold;
+      color: #ffffff;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
+
+
     .live-tile-title {
       font-size: 0.9rem;
       margin-bottom: 0.25rem;
     }
+
     .live-tile-meta {
       font-size: 0.7rem;
       color: #aaa;
     }
+
+    .live-tile-img .device-link {
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+      font-size: 12px;
+      color: #ffffff;
+      opacity: 0.6;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+    }
+
     /* Skeleton placeholders for Live tab */
     .live-tile.skeleton .live-tile-img {
       animation: skeleton-loading 1s linear infinite alternate;
     }
+
     .live-tile.skeleton .live-tile-title,
     .live-tile.skeleton .live-tile-meta {
       background: var(--skeleton-color);
@@ -267,8 +353,8 @@
     }
 
     /* ================================
-       NOTES TAB
-       ================================ */
+            NOTES TAB
+            ================================ */
     .notes-content {
       display: flex;
       align-items: center;
@@ -279,18 +365,21 @@
     }
 
     /* ================================
-       MODAL (for Password)
-       ================================ */
+            MODAL (for Password)
+            ================================ */
     .modal-backdrop {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.8);
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 999;
+      z-index: 1000;
     }
+
     .modal {
       background: var(--accent-color);
       padding: 1rem;
@@ -300,6 +389,7 @@
       gap: 1rem;
       width: 300px;
     }
+
     .modal input {
       width: 100%;
       padding: 0.5rem;
@@ -309,516 +399,726 @@
       color: #fff;
     }
 
+    /* ================================
+            EDIT LINK MODAL
+            ================================ */
+    .edit-link-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+    }
+
+    .edit-link-modal {
+      background: var(--accent-color);
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 350px;
+    }
+
+    .edit-link-modal label {
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .edit-link-modal input[type="text"],
+    .edit-link-modal input[type="url"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      border: 1px solid #444;
+      background: #222;
+      color: #fff;
+    }
+
+    .edit-link-modal .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
   </style>
 </head>
+
 <body>
 
-<div class="app-container">
+  <div class="app-container">
 
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="tab-button active" data-tab="saved" tabindex="1">Saved</button>
-    <button class="tab-button" data-tab="live"  tabindex="2">Live</button>
-    <button class="tab-button" data-tab="notes" tabindex="3">Notes</button>
+    <div class="tabs">
+      <br />
+      <button class="tab-button active" data-tab="saved" tabindex="2">Saved</button>
+      <button class="tab-button" data-tab="live" tabindex="3">Live</button>
+      <button class="tab-button" data-tab="notes" tabindex="4">Notes</button>
+      <br />
+    </div>
+
+    <div class="tab-content active" id="savedTab">
+      <div class="saved-content">
+        <div class="saved-logo" id="savedLogo" tabindex="-1">
+          SVG Logo
+        </div>
+
+        <div class="quick-links" id="quickLinks">
+        </div>
+
+        <div class="drop-zone" id="dropZone">
+          <p>Drag & drop to reorder your links</p>
+        </div>
+
+        <button class="customise-btn" id="customiseBtn" tabindex="">
+          <span class="material-symbols-outlined" style="vertical-align:middle;">edit</span>
+          Customise
+        </button>
+
+        <button class="add-link-btn" id="addLinkBtn">
+          <span class="material-symbols-outlined" style="vertical-align:middle;">add</span>
+          Add Link
+        </button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="liveTab">
+      <div class="live-grid" id="liveGrid">
+      </div>
+    </div>
+
+    <div class="tab-content" id="notesTab">
+      <div class="notes-content">
+        Under development...
+      </div>
+    </div>
+
   </div>
 
-  <!-- TAB CONTENTS -->
-  <!-- 1. Saved Tab -->
-  <div class="tab-content active" id="savedTab">
-    <div class="saved-content">
-      <!-- The "SVG Logo" area -->
-      <div class="saved-logo" id="savedLogo" tabindex="-1">
-        SVG Logo
-      </div>
-
-      <!-- Quick Links Grid -->
-      <div class="quick-links" id="quickLinks">
-        <!-- Populated by JS or skeleton placeholders -->
-      </div>
-
-      <!-- Drop Zone for reordering (visible in edit mode) -->
-      <div class="drop-zone" id="dropZone">
-        <p>Drag & drop to reorder your links</p>
-      </div>
-
-      <!-- Customise button -->
-      <button class="customise-btn" id="customiseBtn" tabindex="4">
-        <span class="material-symbols-outlined" style="vertical-align:middle;">edit</span>
-        Customise
-      </button>
-      
-      <!-- Add link button (visible only in edit mode) -->
-      <button class="add-link-btn" id="addLinkBtn">
-        <span class="material-symbols-outlined" style="vertical-align:middle;">add</span>
-        Add Link
-      </button>
+  <div class="modal-backdrop" id="passwordModal" style="display: none;">
+    <div class="modal">
+      <h3>Enter Password</h3>
+      <form onsubmit="passwordSubmission(event)">
+        <input type="password" id="passwordField" />
+        <button id="passwordSubmitBtn">Submit</button>
+      </form>
     </div>
   </div>
 
-  <!-- 2. Live Tab -->
-  <div class="tab-content" id="liveTab">
-    <div class="live-grid" id="liveGrid">
-      <!-- Populated by JS or skeleton placeholders -->
+  <div class="edit-link-modal-backdrop" id="editLinkModal" style="display: none;">
+    <div class="edit-link-modal">
+      <h3>Edit Link</h3>
+      <label for="editLinkText">Text:</label>
+      <input type="text" id="editLinkText" />
+      <label for="editLinkUrl">URL:</label>
+      <input type="url" id="editLinkUrl" />
+      <div class="modal-buttons">
+        <button id="editLinkCancelBtn">Cancel</button>
+        <button id="editLinkSaveBtn">Save</button>
+      </div>
     </div>
   </div>
 
-  <!-- 3. Notes Tab -->
-  <div class="tab-content" id="notesTab">
-    <div class="notes-content">
-      Under development...
-    </div>
-  </div>
+  <script>
+    /* ===========================================================
+        Utility / Mock / Placeholder Functions
+        =========================================================== */
 
-</div>
-
-<!-- Modal for password if not in URL -->
-<div class="modal-backdrop" id="passwordModal" style="display: none;">
-  <div class="modal">
-    <h3>Enter Password</h3>
-    <input type="password" id="passwordField" />
-    <button id="passwordSubmitBtn">Submit</button>
-  </div>
-</div>
-
-<script>
-/* ===========================================================
-   Utility / Mock / Placeholder Functions
-   =========================================================== */
-
-/**
- * Mock function to decrypt the API URL using the password.
- * Replace with your real decryption method.
- */
-function decryptUrl(encryptedUrl, password) {
-  // For demonstration, assume the "encryptedUrl" is plain text
-  // and we just return it if password is correct.
-  // In real usage, you'd apply actual cryptographic logic.
-  return encryptedUrl;
-}
-
-/**
- * Simple helper to get URL params by name
- */
-function getUrlParam(name) {
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name);
-}
-
-/* ===========================================================
-   Password Check & Modal
-   =========================================================== */
-const passwordModal = document.getElementById('passwordModal');
-const passwordField = document.getElementById('passwordField');
-const passwordSubmitBtn = document.getElementById('passwordSubmitBtn');
-
-// Check if password param is in URL
-let password = getUrlParam('password');
-if (!password) {
-  // Show modal
-  passwordModal.style.display = 'flex';
-  setTimeout(() => {
-    passwordField.focus();
-  }, 50);
-} else {
-  // We have a password param, proceed
-  // decrypt the API URL or do any needed initialization
-  initApp();
-}
-
-passwordSubmitBtn.addEventListener('click', () => {
-  const enteredPass = passwordField.value.trim();
-  if (enteredPass) {
-    // Reload the page with the password param
-    const newUrl = new URL(window.location.href);
-    newUrl.searchParams.set('password', enteredPass);
-    window.location.href = newUrl.toString();
-  }
-});
-
-/* ===========================================================
-   Tabs Switching
-   =========================================================== */
-const tabButtons = document.querySelectorAll('.tab-button');
-const tabContents = document.querySelectorAll('.tab-content');
-
-tabButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    // Deactivate all tabs
-    tabButtons.forEach(b => b.classList.remove('active'));
-    tabContents.forEach(tc => tc.classList.remove('active'));
-
-    // Activate the clicked tab
-    btn.classList.add('active');
-    const tabName = btn.getAttribute('data-tab');
-    document.getElementById(tabName + 'Tab').classList.add('active');
-  });
-});
-
-/* ===========================================================
-   DPAD / Key Handling (fast-forward key = 90)
-   =========================================================== */
-document.addEventListener('keydown', (e) => {
-  if (e.keyCode === 90) {
-    // Keycode 90 pressed (Android fast-forward)
-    // We can run a special function if an element is focused
-    const focused = document.activeElement;
-    if (focused && focused.dataset && focused.dataset.link && !editMode) {
-      // If the item has a data-link, handle fast-forward action
-      handleItemSelect('fastForward', focused.dataset.link);
+    /**
+     * Mock function to decrypt the API URL using the password.
+     * Replace with your real decryption method.
+     */
+    function decryptUrl(encryptedUrl, password) {
+      // For demonstration, assume the "encryptedUrl" is plain text
+      // and we just return it if password is correct.
+      // In real usage, you'd apply actual cryptographic logic.
+      return encryptedUrl;
     }
-  }
-});
 
-/* ===========================================================
-   App Initialization after password is found
-   =========================================================== */
-function initApp() {
-  // In real usage, decrypt the actual API endpoint with the password:
-  const encryptedApiUrl = 'https://example.com/api'; // placeholder
-  const realApiUrl = decryptUrl(encryptedApiUrl, password);
+    /**
+     * Simple helper to get URL params by name
+     */
+    function getUrlParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
 
-  // Start building out the skeletons, then fetch data
-  buildSkeletons();
+    /* ===========================================================
+        Password Check & Modal
+        =========================================================== */
+    const passwordModal = document.getElementById('passwordModal');
+    const passwordField = document.getElementById('passwordField');
+    const passwordSubmitBtn = document.getElementById('passwordSubmitBtn');
 
-  // Load quick links for Saved tab
-  loadQuickLinks(realApiUrl);
+    // Check if password param is in URL
+    let password = getUrlParam('password');
+    if (!password) {
+      // Show modal
+      passwordModal.style.display = 'flex';
+      setTimeout(() => {
+        passwordField.focus();
+        passwordModal.tabIndex = 0;
+      }, 50);
+    } else {
+      // We have a password param, proceed
+      // decrypt the API URL or do any needed initialization
+      initApp();
+    }
 
-  // Load Live tab data
-  loadLiveLinks(realApiUrl);
-}
-
-/* ===========================================================
-   Skeleton Builders
-   =========================================================== */
-function buildSkeletons() {
-  // Saved Tab skeleton (quick links)
-  const quickLinksContainer = document.getElementById('quickLinks');
-  for (let i = 0; i < 5; i++) {
-    const skel = document.createElement('div');
-    skel.classList.add('quick-link', 'skeleton');
-    quickLinksContainer.appendChild(skel);
-  }
-
-  // Live tab skeleton
-  const liveGrid = document.getElementById('liveGrid');
-  for (let i = 0; i < 6; i++) {
-    const tile = document.createElement('div');
-    tile.classList.add('live-tile', 'skeleton');
-
-    const imgDiv = document.createElement('div');
-    imgDiv.classList.add('live-tile-img');
-    tile.appendChild(imgDiv);
-
-    const titleDiv = document.createElement('div');
-    titleDiv.classList.add('live-tile-title');
-    titleDiv.style.height = '1rem';
-    tile.appendChild(titleDiv);
-
-    const metaDiv = document.createElement('div');
-    metaDiv.classList.add('live-tile-meta');
-    metaDiv.style.height = '0.8rem';
-    tile.appendChild(metaDiv);
-
-    liveGrid.appendChild(tile);
-  }
-}
-
-/* ===========================================================
-   Loading & Rendering: Saved Tab
-   =========================================================== */
-function loadQuickLinks(apiUrl) {
-  // Simulate a fetch from your real endpoint
-  // setTimeout to simulate network
-  setTimeout(() => {
-    // Remove skeleton
-    const quickLinksContainer = document.getElementById('quickLinks');
-    quickLinksContainer.innerHTML = '';
-
-    // Mock data
-    const data = [
-      { name: 'Google', link: 'https://google.com'},
-      { name: 'GitHub', link: 'https://github.com'},
-      { name: 'Stack', link: 'https://stackoverflow.com'},
-      { name: 'Reddit', link: 'https://reddit.com'},
-    ];
-
-    data.forEach((item, index) => {
-      renderQuickLink(item, index);
+    passwordSubmitBtn.addEventListener('click', () => {
+      passwordSubmission();
     });
-  }, 1000);
-}
 
-function renderQuickLink(item, index) {
-  const quickLinksContainer = document.getElementById('quickLinks');
-  const ql = document.createElement('div');
-  ql.classList.add('quick-link');
-  ql.tabIndex = 5 + index; // set tab index (just an example)
-  ql.draggable = false; // will enable in edit mode
-  ql.dataset.link = item.link; // store the link for DPAD / fastForward usage
-
-  // Icon container
-  const iconCont = document.createElement('div');
-  iconCont.classList.add('icon-container');
-  const iconImg = document.createElement('img');
-  let urlObj = new URL(item.link);
-  iconImg.src = `https://www.google.com/s2/favicons?domain=${urlObj.hostname}`;
-  iconCont.appendChild(iconImg);
-
-  // Text
-  const textDiv = document.createElement('div');
-  textDiv.classList.add('ql-text');
-  textDiv.textContent = item.name;
-
-  // Remove icon (visible in edit mode)
-  const removeIcon = document.createElement('div');
-  removeIcon.classList.add('remove-icon');
-  removeIcon.innerHTML = '×';
-  removeIcon.addEventListener('click', (e) => {
-    e.stopPropagation();
-    ql.remove();
-  });
-
-  // Build structure
-  ql.appendChild(iconCont);
-  ql.appendChild(textDiv);
-  ql.appendChild(removeIcon);
-
-  // Handle normal click
-  ql.addEventListener('click', () => {
-    if (!editMode) {
-      handleItemSelect('click', item.link);
-    }
-  });
-
-  quickLinksContainer.appendChild(ql);
-}
-
-/* ===========================================================
-   Loading & Rendering: Live Tab
-   =========================================================== */
-function loadLiveLinks(apiUrl) {
-  // Simulate a fetch from your real endpoint
-  setTimeout(() => {
-    // Remove skeleton
-    const liveGrid = document.getElementById('liveGrid');
-    liveGrid.innerHTML = '';
-
-    // Mock data
-    const data = [
-      {
-        title: 'Cool Article',
-        link: 'https://example.com/article',
-        ogImage: 'https://via.placeholder.com/200x100?text=OG+Image',
-        device: 'Desktop Chrome',
-        time: '2025-03-28 10:00'
-      },
-      {
-        title: 'Another Link',
-        link: 'https://example.com/something',
-        ogImage: 'https://via.placeholder.com/200x100?text=OG+Image2',
-        device: 'Mobile',
-        time: '2025-03-28 09:55'
+    function passwordSubmission(e) {
+      try {
+        e.preventDefault(); // Prevent page reload
+      } catch (error) {
+        console.log("Error: " + error);
       }
-    ];
+      const enteredPass = passwordField.value.trim();
+      if (enteredPass) {
+        // Reload the page with the password param
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('password', enteredPass);
+        window.location.href = newUrl.toString();
+      }
+    }
 
-    data.forEach((item, index) => {
-      const tile = document.createElement('div');
-      tile.classList.add('live-tile');
-      tile.tabIndex = 10 + index;
-      tile.dataset.link = item.link;
+    /* ===========================================================
+        Tabs Switching
+        =========================================================== */
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-      // Image
-      const imgDiv = document.createElement('div');
-      imgDiv.classList.add('live-tile-img');
-      const ogImg = document.createElement('img');
-      ogImg.src = item.ogImage;
-      imgDiv.appendChild(ogImg);
+    tabButtons.forEach(btn => {
+      btn.addEventListener('focus', () => {
+        // Deactivate all tabs
+        tabButtons.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(tc => tc.classList.remove('active'));
 
-      // Title
-      const titleDiv = document.createElement('div');
-      titleDiv.classList.add('live-tile-title');
-      titleDiv.textContent = item.title;
+        // Activate the clicked tab
+        btn.classList.add('active');
+        const tabName = btn.getAttribute('data-tab');
+        document.getElementById(tabName + 'Tab').classList.add('active');
+      });
+    });
 
-      // Meta
-      const metaDiv = document.createElement('div');
-      metaDiv.classList.add('live-tile-meta');
-      metaDiv.textContent = `Device: ${item.device} | Time: ${item.time}`;
+    /* ===========================================================
+        DPAD / Key Handling (fast-forward key = 90)
+        =========================================================== */
+    document.addEventListener('keydown', (e) => {
+      if (e.keyCode === 90) {
+        // Keycode 90 pressed (Android fast-forward)
+        // We can run a special function if an element is focused
+        const focused = document.activeElement;
+        if (focused && focused.dataset && focused.dataset.link && !editMode) {
+          // If the item has a data-link, handle fast-forward action
+          handleItemSelect('fastForward', focused.dataset.link);
+        }
+      }
+    });
 
-      // Build structure
-      tile.appendChild(imgDiv);
-      tile.appendChild(titleDiv);
-      tile.appendChild(metaDiv);
+    /* ===========================================================
+        App Initialization after password is found
+        =========================================================== */
+    function initApp() {
+      // In real usage, decrypt the actual API endpoint with the password:
+      const encryptedApiUrl = 'https://example.com/api'; // placeholder
+      const realApiUrl = decryptUrl(encryptedApiUrl, password);
 
-      // Handle normal click
-      tile.addEventListener('click', () => {
-        handleItemSelect('click', item.link);
+      // Start building out the skeletons, then fetch data
+      buildSkeletons();
+
+      // Load quick links for Saved tab
+      loadQuickLinks(realApiUrl);
+
+      // Load Live tab data
+      loadLiveLinks(realApiUrl);
+    }
+
+    /* ===========================================================
+        Skeleton Builders
+        =========================================================== */
+    function buildSkeletons() {
+      // Saved Tab skeleton (quick links)
+      const quickLinksContainer = document.getElementById('quickLinks');
+      for (let i = 0; i < 5; i++) {
+        const skel = document.createElement('div');
+        skel.classList.add('quick-link', 'skeleton');
+        quickLinksContainer.appendChild(skel);
+      }
+
+      // Live tab skeleton
+      const liveGrid = document.getElementById('liveGrid');
+      for (let i = 0; i < 6; i++) {
+        const tile = document.createElement('div');
+        tile.classList.add('live-tile', 'skeleton');
+
+        const imgDiv = document.createElement('div');
+        imgDiv.classList.add('live-tile-img');
+        tile.appendChild(imgDiv);
+
+        const titleDiv = document.createElement('div');
+        titleDiv.classList.add('live-tile-title');
+        titleDiv.style.height = '1rem';
+        tile.appendChild(titleDiv);
+
+        const metaDiv = document.createElement('div');
+        metaDiv.classList.add('live-tile-meta');
+        metaDiv.style.height = '0.8rem';
+        tile.appendChild(metaDiv);
+
+        liveGrid.appendChild(tile);
+      }
+    }
+
+    /* ===========================================================
+        Loading & Rendering: Saved Tab
+        =========================================================== */
+    function loadQuickLinks(apiUrl) {
+      // Simulate a fetch from your real endpoint
+      // setTimeout to simulate network
+      setTimeout(() => {
+        // Remove skeleton
+        const quickLinksContainer = document.getElementById('quickLinks');
+        quickLinksContainer.innerHTML = '';
+
+        // Mock data
+        const data = [
+          { name: 'Google', link: 'https://google.com' },
+          { name: 'GitHub', link: 'https://github.com' },
+          { name: 'Stack', link: 'https://stackoverflow.com' },
+          { name: 'Reddit', link: 'https://reddit.com' },
+        ];
+
+        data.forEach((item, index) => {
+          renderQuickLink(item, index);
+        });
+      }, 1000);
+    }
+
+    function renderQuickLink(item, index) {
+      const quickLinksContainer = document.getElementById('quickLinks');
+      const ql = document.createElement('div');
+      ql.classList.add('quick-link');
+      ql.tabIndex = 5 + index; // set tab index (just an example)
+      ql.draggable = false; // will enable in edit mode
+      ql.dataset.link = item.link; // store the link for DPAD / fastForward usage
+
+      // Icon container
+      const iconCont = document.createElement('div');
+      iconCont.classList.add('icon-container');
+      const iconImg = document.createElement('img');
+      let urlObj = new URL(item.link);
+      iconImg.src = `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${urlObj.hostname}&size=128`;
+      iconCont.appendChild(iconImg);
+
+      // Text
+      const textDiv = document.createElement('div');
+      textDiv.classList.add('ql-text');
+      textDiv.textContent = item.name;
+
+      // Remove icon (visible in edit mode)
+      const removeIcon = document.createElement('div');
+      removeIcon.classList.add('remove-icon');
+      removeIcon.innerHTML = '×';
+      removeIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        ql.remove();
       });
 
-      liveGrid.appendChild(tile);
+      // Build structure
+      ql.appendChild(iconCont);
+      ql.appendChild(textDiv);
+      ql.appendChild(removeIcon);
+
+      // Handle normal click
+      ql.addEventListener('click', () => {
+        if (!editMode) {
+          window.location.href = ql.getAttribute('data-link');
+          //handleItemSelect('click', item.link);
+        }
+      });
+
+      quickLinksContainer.appendChild(ql);
+    }
+
+    /* ===========================================================
+        Loading & Rendering: Live Tab
+        =========================================================== */
+    function loadLiveLinks(apiUrl) {
+      // Simulate a fetch from your real endpoint
+      setTimeout(() => {
+        // Remove skeleton
+        const liveGrid = document.getElementById('liveGrid');
+        liveGrid.innerHTML = '';
+        // get user agent info
+        const galaxytabs8 = navigator.userAgent;
+
+        // Mock data
+        const data = [
+          {
+            title: 'Cool Article',
+            link: 'https://youtube.com',
+            device: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+            time: '2025-03-28 10:00',
+          },
+          {
+            title: 'Another Link',
+            link: 'https://www.instagram.com/p/DHvn5tyyfCnqa_fD5qXxzz0cOAq6GwtNCqc01E0/',
+            device: 'Mozilla/5.0 (Linux; Android 12; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36',
+            time: '2025-03-28 09:55',
+          },
+          {
+            title: 'Firetv Link',
+            link: 'https://amazon.com/',
+            device: 'Mozilla/5.0 (Linux; Android 9; FTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36',
+            time: '2025-03-28 07:55',
+          },
+          {
+            title: 'Windows Link',
+            link: 'https://windows.com/',
+            device: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+            time: '2025-03-28 09:55',
+          },
+          {
+            title: 'Android Link',
+            link: 'https://android.com/',
+            device: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36',
+            time: '2025-03-28 09:55',
+          },
+        ];
+
+        data.forEach((item, index) => {
+          const tile = document.createElement('div');
+          tile.classList.add('live-tile');
+          tile.tabIndex = 10 + index;
+          tile.dataset.link = item.link;
+
+          // Image
+          const imgDiv = document.createElement('div');
+          imgDiv.classList.add('live-tile-img');
+          const ogImg = document.createElement('img');
+          let urlObj = new URL(item.link);
+          ogImg.src = `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${urlObj.hostname}&size=128`;
+
+          const os = item.device;
+
+
+          const deviceInfoDiv = document.createElement("div");
+          deviceInfoDiv.classList.add("device-info");
+
+          let deviceIcon = "question_mark"; // Default icon
+          var str = "";
+          if (os.toLowerCase().includes("android") && item.device.includes("FT") && item.device.includes("TV")) {
+            str = "TV";
+            deviceIcon = "tv"; // Fire TV
+          } else if (os.toLowerCase().includes("android")) {
+            str = "Android";
+            deviceIcon = "smartphone"; // Android
+          } else if (os.toLowerCase().includes("windows")) {
+            str = "Windows";
+            deviceIcon = "desktop_windows";
+          }
+          deviceInfoDiv.innerHTML = `<span class="material-symbols-outlined">${deviceIcon}</span>
+          ${str}`;
+          //console.log(str);
+          imgDiv.appendChild(ogImg);
+          imgDiv.appendChild(deviceInfoDiv);
+
+          // Title
+          const deviceLinkDiv = document.createElement("div");
+          deviceLinkDiv.classList.add("device-link");
+          deviceLinkDiv.textContent = item.link;
+          imgDiv.appendChild(deviceLinkDiv);
+          const titleDiv = document.createElement('div');
+          titleDiv.classList.add('live-tile-title');
+          titleDiv.textContent = item.title;
+
+          // Meta
+          const metaDiv = document.createElement('div');
+          metaDiv.classList.add('live-tile-meta');
+          metaDiv.textContent = `Time: ${item.time}`;
+
+          // Build structure
+          tile.appendChild(imgDiv);
+          tile.appendChild(titleDiv);
+          tile.appendChild(metaDiv);
+
+          // Handle normal click
+          tile.addEventListener('click', () => {
+            handleItemSelect('click', item.link);
+          });
+
+          liveGrid.appendChild(tile);
+        });
+      }, 1500);
+    }
+
+    /* ===========================================================
+        Handling Click vs FastForward
+        =========================================================== */
+    function handleItemSelect(eventType, link) {
+      if (eventType === 'click') {
+        // Normal click -> open link
+        window.open(link, '_blank');
+      } else if (eventType === 'fastForward') {
+        // Fast-forward key pressed -> do something else
+        console.log('Fast-forward event on link:', link);
+        // e.g. show a context menu, or load preview, etc.
+        alert('Fast-forward key event triggered for ' + link);
+      }
+    }
+
+    document.addEventListener("keydown", function (event) {
+      //alert(`Key pressed: ${event.key}, KeyCode: ${event.keyCode}`);
     });
-  }, 1500);
-}
 
-/* ===========================================================
-   Handling Click vs FastForward
-   =========================================================== */
-function handleItemSelect(eventType, link) {
-  if (eventType === 'click') {
-    // Normal click -> open link
-    window.open(link, '_blank');
-  } else if (eventType === 'fastForward') {
-    // Fast-forward key pressed -> do something else
-    console.log('Fast-forward event on link:', link);
-    // e.g. show a context menu, or load preview, etc.
-    alert('Fast-forward key event triggered for ' + link);
-  }
-}
+    /* ===========================================================
+        Edit / Customize Mode for Quick Links
+        =========================================================== */
+    const customiseBtn = document.getElementById('customiseBtn');
+    const addLinkBtn = document.getElementById('addLinkBtn');
+    const quickLinksContainer = document.getElementById('quickLinks');
+    const dropZone = document.getElementById('dropZone');
+    const editLinkModal = document.getElementById('editLinkModal');
+    const editLinkText = document.getElementById('editLinkText');
+    const editLinkUrl = document.getElementById('editLinkUrl');
+    const editLinkCancelBtn = document.getElementById('editLinkCancelBtn');
+    const editLinkSaveBtn = document.getElementById('editLinkSaveBtn');
 
-/* ===========================================================
-   Edit / Customize Mode for Quick Links
-   =========================================================== */
-const customiseBtn = document.getElementById('customiseBtn');
-const addLinkBtn = document.getElementById('addLinkBtn');
-const quickLinksContainer = document.getElementById('quickLinks');
-const dropZone = document.getElementById('dropZone');
+    let editMode = false;
+    let draggedItem = null;
+    let originalTabIndices = {};
+    let currentEditingLink = null;
 
-let editMode = false;
-let draggedItem = null;
+    customiseBtn.addEventListener('click', () => {
+      editMode = !editMode;
+      if (editMode) {
+        customiseBtn.innerHTML = '<span class="material-symbols-outlined" style="vertical-align:middle;">check</span> Done';
+        enableEditMode();
+      } else {
+        customiseBtn.innerHTML = '<span class="material-symbols-outlined" style="vertical-align:middle;">edit</span> Customise';
+        disableEditMode();
+        // TODO: POST updated order to API, if needed
+      }
+    });
 
-customiseBtn.addEventListener('click', () => {
-  editMode = !editMode;
-  if (editMode) {
-    customiseBtn.innerHTML = '<span class="material-symbols-outlined" style="vertical-align:middle;">check</span> Done';
-    enableEditMode();
-  } else {
-    customiseBtn.innerHTML = '<span class="material-symbols-outlined" style="vertical-align:middle;">edit</span> Customise';
-    disableEditMode();
-    // TODO: POST updated order to API, if needed
-  }
-});
+    addLinkBtn.addEventListener('click', () => {
+      // Mock adding a new link
+      const newLink = {
+        name: 'New Link',
+        link: 'https://example.com/new',
+        icon: 'https://via.placeholder.com/32?text=New'
+      };
+      renderQuickLink(newLink, document.querySelectorAll('.quick-link').length);
 
-addLinkBtn.addEventListener('click', () => {
-  // Mock adding a new link
-  const newLink = {
-    name: 'New Link',
-    link: 'https://example.com/new',
-    icon: 'https://via.placeholder.com/32?text=New'
-  };
-  renderQuickLink(newLink, document.querySelectorAll('.quick-link').length);
-  
-  // Make sure the new link is properly set up for edit mode
-  const newElement = quickLinksContainer.lastElementChild;
-  newElement.draggable = true;
-  newElement.style.cursor = 'grab';
-  newElement.classList.add('edit-mode');
-  setupDragEvents(newElement);
-});
+      // Make sure the new link is properly set up for edit mode
+      const newElement = quickLinksContainer.lastElementChild;
+      newElement.draggable = true;
+      newElement.style.cursor = 'grab';
+      newElement.classList.add('edit-mode');
+      setupDragEvents(newElement);
+      setupDoubleClickEdit(newElement); // Add double-click listener for the new element
+    });
 
-function enableEditMode() {
-  // Show dropZone or any instructions
-  dropZone.classList.add('edit-mode');
-  addLinkBtn.classList.add('edit-mode');
-  
-  // Make quick-links draggable and add edit mode styles
-  Array.from(quickLinksContainer.children).forEach(linkEl => {
-    linkEl.draggable = true;
-    linkEl.style.cursor = 'grab';
-    linkEl.classList.add('edit-mode');
-    setupDragEvents(linkEl);
-  });
-  
-  // Add dragover listener to the container
-  quickLinksContainer.addEventListener('dragover', handleContainerDragOver);
-}
+    function enableEditMode() {
+      // Store original tabindex values
+      originalTabIndices = {};
+      document.querySelectorAll('[tabindex]').forEach(el => {
+        originalTabIndices[el.getAttribute('tabindex')] = el;
+        el.setAttribute('tabindex', -1); // Remove tabindex during edit
+      });
 
-function setupDragEvents(linkEl) {
-  linkEl.addEventListener('dragstart', onDragStart);
-  linkEl.addEventListener('dragend', onDragEnd);
-}
+      // Show dropZone or any instructions
+      dropZone.classList.add('edit-mode');
+      addLinkBtn.classList.add('edit-mode');
 
-function disableEditMode() {
-  dropZone.classList.remove('edit-mode');
-  addLinkBtn.classList.remove('edit-mode');
-  
-  // Remove edit mode from links
-  Array.from(quickLinksContainer.children).forEach(linkEl => {
-    linkEl.draggable = false;
-    linkEl.style.cursor = 'pointer';
-    linkEl.classList.remove('edit-mode');
-    linkEl.removeEventListener('dragstart', onDragStart);
-    linkEl.removeEventListener('dragend', onDragEnd);
-  });
-  
-  // Remove container listeners
-  quickLinksContainer.removeEventListener('dragover', handleContainerDragOver);
-}
+      // Make quick-links draggable and add edit mode styles
+      Array.from(quickLinksContainer.children).forEach(linkEl => {
+        linkEl.draggable = true;
+        linkEl.style.cursor = 'grab';
+        linkEl.classList.add('edit-mode');
+        setupDragEvents(linkEl);
+        setupDoubleClickEdit(linkEl); // Add double-click listener
+      });
 
-function onDragStart(e) {
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', null); // Required for Firefox
-  
-  draggedItem = this;
-  this.classList.add('dragging');
-  
-  // Small delay so the dragging visual effect works
-  setTimeout(() => {
-    this.style.opacity = '0.5';
-  }, 0);
-}
+      // Add dragover listener to the container
+      quickLinksContainer.addEventListener('dragover', handleContainerDragOver);
+    }
 
-function onDragEnd(e) {
-  this.style.opacity = '1';
-  this.classList.remove('dragging');
-  draggedItem = null;
-  
-  // Remove any temporary placeholders
-  const placeholders = document.querySelectorAll('.placeholder');
-  placeholders.forEach(el => el.remove());
-}
+    function setupDragEvents(linkEl) {
+      linkEl.addEventListener('dragstart', onDragStart);
+      linkEl.addEventListener('dragend', onDragEnd);
+    }
 
-function handleContainerDragOver(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  
-  if (!draggedItem) return;
-  
-  // Get the element under the cursor
-  const afterElement = getDragAfterElement(quickLinksContainer, e.clientX, e.clientY);
-  
-  if (afterElement === null) {
-    quickLinksContainer.appendChild(draggedItem);
-  } else if (afterElement !== draggedItem) {
-    quickLinksContainer.insertBefore(draggedItem, afterElement);
-  }
-}
+    function disableEditMode() {
+      dropZone.classList.remove('edit-mode');
+      addLinkBtn.classList.remove('edit-mode');
 
-/**
- * Helper to figure out the correct place to drop the dragged item.
- * Fixed to work with any element position, not just start/end.
- */
-function getDragAfterElement(container, x, y) {
-  // Get all the draggable elements that aren't currently being dragged
-  const draggableElements = [...container.querySelectorAll('.quick-link:not(.dragging)')];
-  
-  // Find the closest element based on mouse position
-  return draggableElements.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const centerX = box.left + box.width / 2;
-    const centerY = box.top + box.height / 2;
-    
-    // Calculate distance from mouse to center of element
-    const offsetX = x - centerX;
-    const offsetY = y - centerY;
-    const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-    
-    // Return the closest element
-    return (distance < closest.distance) ? 
-      { distance: distance, element: child } : 
-      closest;
-  }, { distance: Number.POSITIVE_INFINITY }).element;
-}
+      // Remove edit mode from links
+      Array.from(quickLinksContainer.children).forEach(linkEl => {
+        linkEl.draggable = false;
+        linkEl.style.cursor = 'pointer';
+        linkEl.classList.remove('edit-mode');
+        linkEl.removeEventListener('dragstart', onDragStart);
+        linkEl.removeEventListener('dragend', onDragEnd);
+        linkEl.removeEventListener('dblclick', openEditLinkModal); // Remove double-click listener
+      });
 
-</script>
+      // Remove container listeners
+      quickLinksContainer.removeEventListener('dragover', handleContainerDragOver);
 
+      // Reassign tabindex
+      Object.keys(originalTabIndices).forEach(index => {
+        originalTabIndices[index].setAttribute('tabindex', index);
+      });
+      originalTabIndices = {}; // Clear stored indices
+
+      // Call the function to apply tabindex
+      setTabIndexForQuickLinks();
+
+    }
+
+    function setTabIndexForQuickLinks() {
+      const quickLinks = document.querySelectorAll('.quick-link,.edit-mode');
+
+      quickLinks.forEach((element, index) => {
+        element.tabIndex = 4 + index;
+      });
+    }
+
+
+    function onDragStart(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', null); // Required for Firefox
+
+      draggedItem = this;
+      this.classList.add('dragging');
+
+      // Small delay so the dragging visual effect works
+      setTimeout(() => {
+        this.style.opacity = '0.5';
+      }, 0);
+    }
+
+    function onDragEnd(e) {
+      this.style.opacity = '1';
+      this.classList.remove('dragging');
+      draggedItem = null;
+
+      // Remove any temporary placeholders
+      const placeholders = document.querySelectorAll('.placeholder');
+      placeholders.forEach(el => el.remove());
+    }
+
+    function handleContainerDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!draggedItem) return;
+
+      // Get the element under the cursor
+      const afterElement = getDragAfterElement(quickLinksContainer, e.clientX, e.clientY);
+
+      if (afterElement === null) {
+        quickLinksContainer.appendChild(draggedItem);
+      } else if (afterElement !== draggedItem) {
+        quickLinksContainer.insertBefore(draggedItem, afterElement);
+      }
+    }
+
+    /**
+     * Helper to figure out the correct place to drop the dragged item.
+     * Fixed to work with any element position, not just start/end.
+     */
+    function getDragAfterElement(container, x, y) {
+      // Get all the draggable elements that aren't currently being dragged
+      const draggableElements = [...container.querySelectorAll('.quick-link:not(.dragging)')];
+
+      // Find the closest element based on mouse position
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const centerX = box.left + box.width / 2;
+        const centerY = box.top + box.height / 2;
+
+        // Calculate distance from mouse to center of element
+        const offsetX = x - centerX;
+        const offsetY = y - centerY;
+        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+
+        // Return the closest element
+        return (distance < closest.distance) ?
+          { distance: distance, element: child } :
+          closest;
+      }, { distance: Number.POSITIVE_INFINITY }).element;
+    }
+
+    /* ===========================================================
+        Edit Link Modal Functionality
+        =========================================================== */
+    function setupDoubleClickEdit(linkElement) {
+      linkElement.addEventListener('dblclick', openEditLinkModal);
+    }
+
+    function openEditLinkModal(e) {
+      if (!editMode) return;
+
+      currentEditingLink = e.currentTarget;
+      const textElement = currentEditingLink.querySelector('.ql-text');
+      const linkUrl = currentEditingLink.dataset.link;
+
+      editLinkText.value = textElement ? textElement.textContent : '';
+      editLinkUrl.value = linkUrl;
+
+      editLinkModal.style.display = 'flex';
+    }
+
+    editLinkCancelBtn.addEventListener('click', () => {
+      editLinkModal.style.display = 'none';
+      currentEditingLink = null;
+    });
+
+    editLinkSaveBtn.addEventListener('click', () => {
+      if (!currentEditingLink) return;
+
+      const newText = editLinkText.value.trim();
+      const newUrl = editLinkUrl.value.trim();
+
+      const textElement = currentEditingLink.querySelector('.ql-text');
+      if (textElement) {
+        textElement.textContent = newText;
+      }
+      currentEditingLink.dataset.link = newUrl;
+
+      // Update the favicon (basic implementation, might need refinement)
+      const iconImg = currentEditingLink.querySelector('.icon-container img');
+      if (iconImg) {
+        try {
+          let urlObj = new URL(newUrl);
+          iconImg.src = `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${urlObj.hostname}&size=128`;
+        } catch (error) {
+          console.error("Invalid URL:", newUrl);
+          // Optionally set a default icon or handle the error
+        }
+      }
+
+      editLinkModal.style.display = 'none';
+      currentEditingLink = null;
+    });
+
+    // Close modal if clicked outside
+    window.addEventListener('click', (event) => {
+      if (event.target === editLinkModal) {
+        editLinkModal.style.display = 'none';
+        currentEditingLink = null;
+      }
+    });
+  </script>
 </body>
+
 </html>
