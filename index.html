@@ -611,7 +611,7 @@
         DPAD / Key Handling (fast-forward key = 90)
         =========================================================== */
     document.addEventListener('keydown', (e) => {
-      if (e.keyCode === 90) {
+      if (e.keyCode === 228) {
         // Keycode 90 pressed (Android fast-forward)
         // We can run a special function if an element is focused
         const focused = document.activeElement;
@@ -874,9 +874,10 @@
       }
     }
 
-    document.addEventListener("keydown", function (event) {
-      alert(`Key pressed: ${event.key}, KeyCode: ${event.keyCode}`);
-    });
+    // document.addEventListener("keydown", function (event) {
+    //   //alert(`Key pressed: ${event.key}, KeyCode: ${event.keyCode}`);
+    //   // MediaFastForward, keyCode: 228
+    // });
 
     /* ===========================================================
         Edit / Customize Mode for Quick Links
