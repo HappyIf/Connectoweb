@@ -53,11 +53,14 @@
     button:focus,
     [tabindex]:focus {
       /* outline: 2px solid #888; */
-      transform: scale(1.3); /* Slightly zoom in */
-      box-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Add a subtle elevation effect */
-      transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Smooth transition for the effects */
+      transform: scale(1.3);
+      /* Slightly zoom in */
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+      /* Add a subtle elevation effect */
+      transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+      /* Smooth transition for the effects */
     }
-    
+
 
 
 
@@ -122,15 +125,19 @@
     }
 
     .saved-logo {
+      margin-left: 35px;
       margin-top: 1rem;
-      font-size: 2rem;
-      border: 2px dashed #666;
-      width: 200px;
-      height: 100px;
+      width: 350px;
+      height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
       border-radius: var(--border-radius);
+    }
+    .saved-logo svg {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
     }
 
     .quick-links {
@@ -154,7 +161,7 @@
 
     .quick-link:focus {
       /* outline: 2px solid #888; */
-      
+
     }
 
     .quick-link .icon-container {
@@ -259,7 +266,7 @@
     .live-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 5rem;
+      gap: 3rem;
     }
 
     .live-tile {
@@ -272,7 +279,7 @@
 
     .live-tile:focus {
       /* outline: 2px solid #888; */
-      
+
     }
 
     .live-tile-img {
@@ -528,14 +535,151 @@
         Utility / Mock / Placeholder Functions
         =========================================================== */
 
+    // Import CryptoJS library for AES encryption/decryption
+    // Assuming it's included via a <script> tag before this code
+
+    async function encryptData(data, password) {
+      if (typeof data !== 'string' || data.trim() === '' ||
+        typeof password !== 'string' || password.trim() === '') {
+        console.error('Invalid data or password provided for encryption.');
+        return;
+      }
+
+      try {
+        // Convert the password string to an array of bytes
+        const textEncoder = new TextEncoder();
+        const passwordBytes = textEncoder.encode(password);
+
+        // Derive a cryptographic key from the password
+        const passwordKey = await window.crypto.subtle.importKey(
+          'raw',
+          passwordBytes,
+          { name: 'PBKDF2' },
+          false,
+          ['deriveKey']
+        );
+
+        // Derive an AES key
+        const aesKey = await window.crypto.subtle.deriveKey(
+          {
+            name: 'PBKDF2',
+            salt: passwordBytes, // Use the password itself as the salt for simplicity
+            iterations: 100000,
+            hash: 'SHA-256'
+          },
+          passwordKey,
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+
+        // Generate a random initialization vector (IV)
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+
+        // Encrypt the data
+        const dataBytes = textEncoder.encode(data);
+        const encryptedData = await window.crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv },
+          aesKey,
+          dataBytes
+        );
+
+        // Concatenate the IV and encrypted data
+        const encryptedArray = new Uint8Array(iv.length + encryptedData.byteLength);
+        encryptedArray.set(iv);
+        encryptedArray.set(new Uint8Array(encryptedData), iv.length);
+
+        // Convert to Base64 and log the result
+        const encryptedString = btoa(String.fromCharCode(...encryptedArray));
+        console.log(encryptedString);
+        return encryptedString;
+      } catch (error) {
+        console.error('Encryption failed:', error);
+      }
+    }
+
+    async function encryptSVG(svgContent, password) {
+        if (typeof svgContent !== 'string' || svgContent.trim() === '') {
+            console.error('Invalid SVG content provided for encryption.');
+            return;
+        }
+        const encryptedSvg = await encryptData(svgContent, password);
+        console.log('Encrypted SVG:', encryptedSvg);
+        return encryptedSvg;
+    }
+
+    async function decryptData(encryptedData, password) {
+      // Check for valid encrypted data and password
+      if (typeof encryptedData !== 'string' || encryptedData.trim() === '' ||
+        typeof password !== 'string' || password.trim() === '') {
+        console.error('Invalid encrypted data or password provided for decryption.');
+        return;
+      }
+
+      try {
+        // Convert the Base64 string back to a Uint8Array
+        const encryptedArray = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+        const iv = encryptedArray.slice(0, 12);
+        const encryptedBytes = encryptedArray.slice(12);
+
+        // Convert the password string to an array of bytes
+        const textEncoder = new TextEncoder();
+        const passwordBytes = textEncoder.encode(password);
+
+        // Derive the key
+        const passwordKey = await window.crypto.subtle.importKey(
+          'raw',
+          passwordBytes,
+          { name: 'PBKDF2' },
+          false,
+          ['deriveKey']
+        );
+
+        // Derive an AES key
+        const aesKey = await window.crypto.subtle.deriveKey(
+          {
+            name: 'PBKDF2',
+            salt: passwordBytes,
+            iterations: 100000,
+            hash: 'SHA-256'
+          },
+          passwordKey,
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+
+        // Decrypt the data
+        const decryptedData = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, aesKey, encryptedBytes);
+
+        // Convert to string and log the result
+        const decryptedString = new TextDecoder().decode(decryptedData);
+        //console.log(decryptedString);
+        return decryptedString;
+      } catch (error) {
+        console.error('Decryption failed:', error);
+      }
+    }
+
+    async function decryptAndPlaceSVG(encryptedSvg, password, elementId) {
+      const decryptedSvg = await decryptData(encryptedSvg, password);
+      if (decryptedSvg) {
+        const svgElement = document.getElementById(elementId);
+        if (svgElement) {
+          svgElement.innerHTML = decryptedSvg;
+        }
+      }
+    }
+
     /**
      * Mock function to decrypt the API URL using the password.
      * Replace with your real decryption method.
      */
     function decryptUrl(encryptedUrl, password) {
-      // For demonstration, assume the "encryptedUrl" is plain text
-      // and we just return it if password is correct.
-      // In real usage, you'd apply actual cryptographic logic.
+      // if(decryptData(encryptedUrl, password) == null)
+      // return encryptedUrl;
+      // else
+      // return decryptData(encryptedUrl, password);
       return encryptedUrl;
     }
 
@@ -570,6 +714,7 @@
     }
 
     passwordSubmitBtn.addEventListener('click', () => {
+
       passwordSubmission();
     });
 
@@ -625,19 +770,34 @@
     /* ===========================================================
         App Initialization after password is found
         =========================================================== */
-    function initApp() {
-      // In real usage, decrypt the actual API endpoint with the password:
-      const encryptedApiUrl = 'https://example.com/api'; // placeholder
-      const realApiUrl = decryptUrl(encryptedApiUrl, password);
+    async function initApp() {
+      const response = await fetch("/secrets.json", {
 
+      });
+
+      let params = new URLSearchParams(document.location.search)
+      let pass = params.get("password");
+
+      const result = await response.json();
+      //const array = JSON.parse(result);
+
+      var baseURL = result[0]["api"];
+      baseURL = await decryptData(baseURL, pass);
+      baseURL = baseURL + pass;
+
+      //console.log(result[0]["logo"]);
+      let encryptedSVG = result[0]["logo"];
+      await decryptAndPlaceSVG(encryptedSVG,pass, "savedLogo");
+      // In real usage, decrypt the actual API endpoint with the password:
+      
       // Start building out the skeletons, then fetch data
       buildSkeletons();
 
       // Load quick links for Saved tab
-      loadQuickLinks(realApiUrl);
+      loadQuickLinks();
 
       // Load Live tab data
-      loadLiveLinks(realApiUrl);
+      loadLiveLinks(baseURL+"&path=system/live.json");
     }
 
     /* ===========================================================
@@ -750,48 +910,132 @@
     /* ===========================================================
         Loading & Rendering: Live Tab
         =========================================================== */
-    function loadLiveLinks(apiUrl) {
-      // Simulate a fetch from your real endpoint
-      setTimeout(() => {
+    /* function loadLiveLinks(apiUrl) {
+     
+       // Remove skeleton
+       const liveGrid = document.getElementById('liveGrid');
+       liveGrid.innerHTML = '';
+         // get user agent info
+ 
+         // Mock data
+         const data = [
+           {
+             title: 'Cool Article',
+             link: 'https://youtube.com',
+             device: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
+             time: '2025-03-28 10:00',
+           },
+           {
+             title: 'Another Link',
+             link: 'https://www.instagram.com/p/DHvn5tyyfCnqa_fD5qXxzz0cOAq6GwtNCqc01E0/',
+             device: 'Mozilla/5.0 (Linux; Android 12; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36',
+             time: '2025-03-28 09:55',
+           },
+           {
+             title: 'Firetv Link',
+             link: 'https://amazon.com/',
+             device: 'Mozilla/5.0 (Linux; Android 9; FTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36',
+             time: '2025-03-28 07:55',
+           },
+           {
+             title: 'Windows Link',
+             link: 'https://windows.com/',
+             device: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+             time: '2025-03-28 09:55',
+           },
+           {
+             title: 'Android Link',
+             link: 'https://android.com/',
+             device: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36',
+             time: '2025-03-28 09:55',
+           },
+         ];
+ 
+         data.forEach((item, index) => {
+           const tile = document.createElement('div');
+           tile.classList.add('live-tile');
+           tile.tabIndex = 10 + index;
+           tile.dataset.link = item.link;
+ 
+           // Image
+           const imgDiv = document.createElement('div');
+           imgDiv.classList.add('live-tile-img');
+           const ogImg = document.createElement('img');
+           let urlObj = new URL(item.link);
+           ogImg.src = `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${urlObj.hostname}&size=128`;
+ 
+           const os = item.device;
+ 
+ 
+           const deviceInfoDiv = document.createElement("div");
+           deviceInfoDiv.classList.add("device-info");
+ 
+           let deviceIcon = "question_mark"; // Default icon
+           var str = "";
+           if (os.toLowerCase().includes("android") && item.device.includes("FT") && item.device.includes("TV")) {
+             str = "TV";
+             deviceIcon = "tv"; // Fire TV
+           } else if (os.toLowerCase().includes("android")) {
+             str = "Android";
+             deviceIcon = "smartphone"; // Android
+           } else if (os.toLowerCase().includes("windows")) {
+             str = "Windows";
+             deviceIcon = "desktop_windows";
+           }
+           deviceInfoDiv.innerHTML = `<span class="material-symbols-outlined">${deviceIcon}</span>
+           ${str}`;
+           //console.log(str);
+           imgDiv.appendChild(ogImg);
+           imgDiv.appendChild(deviceInfoDiv);
+ 
+           // Title
+           const deviceLinkDiv = document.createElement("div");
+           deviceLinkDiv.classList.add("device-link");
+           deviceLinkDiv.textContent = item.link;
+           imgDiv.appendChild(deviceLinkDiv);
+           const titleDiv = document.createElement('div');
+           titleDiv.classList.add('live-tile-title');
+           titleDiv.textContent = item.title;
+ 
+           // Meta
+           const metaDiv = document.createElement('div');
+           metaDiv.classList.add('live-tile-meta');
+           metaDiv.textContent = `Time: ${item.time}`;
+ 
+           // Build structure
+           tile.appendChild(imgDiv);
+           tile.appendChild(titleDiv);
+           tile.appendChild(metaDiv);
+ 
+           // Handle normal click
+           tile.addEventListener('click', () => {
+             handleItemSelect('click', item.link);
+           });
+ 
+           liveGrid.appendChild(tile);
+         });
+       
+     }*/
+    async function loadLiveLinks(apiUrl) {
+      try {
+        const response = await fetch(apiUrl, {
+
+        });
+
+        const result = await response.json();
+
+        // Parse message field as JSON
+        let data;
+        try {
+          data = JSON.parse(result.message.replace(/\r?\n/g, ''));
+        } catch (error) {
+          console.error("Error parsing message JSON:", error);
+          return;
+        }
+
         // Remove skeleton
         const liveGrid = document.getElementById('liveGrid');
         liveGrid.innerHTML = '';
-        // get user agent info
-        const galaxytabs8 = navigator.userAgent;
-
-        // Mock data
-        const data = [
-          {
-            title: 'Cool Article',
-            link: 'https://youtube.com',
-            device: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
-            time: '2025-03-28 10:00',
-          },
-          {
-            title: 'Another Link',
-            link: 'https://www.instagram.com/p/DHvn5tyyfCnqa_fD5qXxzz0cOAq6GwtNCqc01E0/',
-            device: 'Mozilla/5.0 (Linux; Android 12; ) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.53 Safari/537.36',
-            time: '2025-03-28 09:55',
-          },
-          {
-            title: 'Firetv Link',
-            link: 'https://amazon.com/',
-            device: 'Mozilla/5.0 (Linux; Android 9; FTV) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36',
-            time: '2025-03-28 07:55',
-          },
-          {
-            title: 'Windows Link',
-            link: 'https://windows.com/',
-            device: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-            time: '2025-03-28 09:55',
-          },
-          {
-            title: 'Android Link',
-            link: 'https://android.com/',
-            device: 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36',
-            time: '2025-03-28 09:55',
-          },
-        ];
 
         data.forEach((item, index) => {
           const tile = document.createElement('div');
@@ -803,43 +1047,42 @@
           const imgDiv = document.createElement('div');
           imgDiv.classList.add('live-tile-img');
           const ogImg = document.createElement('img');
-          let urlObj = new URL(item.link);
+          let urlObj = new URL(item.link.trim());
           ogImg.src = `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${urlObj.hostname}&size=128`;
 
+          // Determine device type
           const os = item.device;
-
-
           const deviceInfoDiv = document.createElement("div");
           deviceInfoDiv.classList.add("device-info");
+          let deviceIcon = "question_mark";
+          let str = "";
 
-          let deviceIcon = "question_mark"; // Default icon
-          var str = "";
-          if (os.toLowerCase().includes("android") && item.device.includes("FT") && item.device.includes("TV")) {
+          if (os.toLowerCase().includes("android") && os.includes("FT") && os.includes("TV")) {
             str = "TV";
-            deviceIcon = "tv"; // Fire TV
+            deviceIcon = "tv";
           } else if (os.toLowerCase().includes("android")) {
             str = "Android";
-            deviceIcon = "smartphone"; // Android
+            deviceIcon = "smartphone";
           } else if (os.toLowerCase().includes("windows")) {
             str = "Windows";
             deviceIcon = "desktop_windows";
           }
-          deviceInfoDiv.innerHTML = `<span class="material-symbols-outlined">${deviceIcon}</span>
-          ${str}`;
-          //console.log(str);
+          deviceInfoDiv.innerHTML = `<span class="material-symbols-outlined">${deviceIcon}</span> ${str}`;
           imgDiv.appendChild(ogImg);
           imgDiv.appendChild(deviceInfoDiv);
 
-          // Title
+          // Link Display
           const deviceLinkDiv = document.createElement("div");
           deviceLinkDiv.classList.add("device-link");
-          deviceLinkDiv.textContent = item.link;
+          deviceLinkDiv.textContent = item.link.trim();
           imgDiv.appendChild(deviceLinkDiv);
+
+          // Title
           const titleDiv = document.createElement('div');
           titleDiv.classList.add('live-tile-title');
           titleDiv.textContent = item.title;
 
-          // Meta
+          // Meta Info
           const metaDiv = document.createElement('div');
           metaDiv.classList.add('live-tile-meta');
           metaDiv.textContent = `Time: ${item.time}`;
@@ -849,19 +1092,26 @@
           tile.appendChild(titleDiv);
           tile.appendChild(metaDiv);
 
-          // Handle normal click
+          // Handle Click
           tile.addEventListener('click', () => {
-            handleItemSelect('click', item.link);
+            handleItemSelect('click', item.link.trim());
           });
 
           liveGrid.appendChild(tile);
         });
-      }, 1500);
+      } catch (error) {
+        console.error("Error loading live links:", error);
+      }
     }
+
 
     /* ===========================================================
         Handling Click vs FastForward
         =========================================================== */
+
+    // Call function with API URL
+    // loadLiveLinks("https://api.com/getrequest");
+
     function handleItemSelect(eventType, link) {
       if (eventType === 'click') {
         // Normal click -> open link
@@ -980,13 +1230,23 @@
       });
       originalTabIndices = {}; // Clear stored indices
 
+      //log data array
+      const data = Array.from(quickLinksContainer.children).map(linkEl => {
+        return {
+          name: linkEl.querySelector('.ql-text').textContent,
+          link: linkEl.dataset.link
+        };
+      });
+
+      console.log(JSON.stringify(data, null, 2));
+
+
       // Call the function to apply tabindex
       setTabIndexForQuickLinks();
-
     }
 
     function setTabIndexForQuickLinks() {
-      const quickLinks = document.querySelectorAll('.quick-link,.edit-mode');
+      const quickLinks = document.querySelectorAll('.quick-link');
 
       quickLinks.forEach((element, index) => {
         element.tabIndex = 4 + index;
