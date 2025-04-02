@@ -134,6 +134,7 @@
       justify-content: center;
       border-radius: var(--border-radius);
     }
+
     .saved-logo svg {
       max-width: 100%;
       max-height: 100%;
@@ -462,16 +463,16 @@
 
     <div class="tabs">
       <br />
-      <button class="tab-button active" data-tab="saved" tabindex="2">Saved</button>
-      <button class="tab-button" data-tab="live" tabindex="3">Live</button>
-      <button class="tab-button" data-tab="notes" tabindex="4">Notes</button>
+      <button id="savedbtn" class="tab-button active" data-tab="saved" tabindex="2">Saved</button>
+      <button id="livebtn" class="tab-button" data-tab="live" tabindex="3">Live</button>
+      <button id="notesbtn" class="tab-button" data-tab="notes" tabindex="4">Notes</button>
       <br />
     </div>
 
     <div class="tab-content active" id="savedTab">
       <div class="saved-content">
         <div class="saved-logo" id="savedLogo" tabindex="-1">
-          SVG Logo
+
         </div>
 
         <div class="quick-links" id="quickLinks">
@@ -599,13 +600,13 @@
     }
 
     async function encryptSVG(svgContent, password) {
-        if (typeof svgContent !== 'string' || svgContent.trim() === '') {
-            console.error('Invalid SVG content provided for encryption.');
-            return;
-        }
-        const encryptedSvg = await encryptData(svgContent, password);
-        console.log('Encrypted SVG:', encryptedSvg);
-        return encryptedSvg;
+      if (typeof svgContent !== 'string' || svgContent.trim() === '') {
+        console.error('Invalid SVG content provided for encryption.');
+        return;
+      }
+      const encryptedSvg = await encryptData(svgContent, password);
+      console.log('Encrypted SVG:', encryptedSvg);
+      return encryptedSvg;
     }
 
     async function decryptData(encryptedData, password) {
@@ -770,6 +771,7 @@
     /* ===========================================================
         App Initialization after password is found
         =========================================================== */
+    var baseURL;
     async function initApp() {
       const response = await fetch("https://raw.githubusercontent.com/HappyIf/Connectoweb/refs/heads/main/secrets.json", {
 
@@ -781,15 +783,15 @@
       const result = await response.json();
       //const array = JSON.parse(result);
 
-      var baseURL = result[0]["api"];
+      baseURL = result[0]["api"];
       baseURL = await decryptData(baseURL, pass);
       baseURL = baseURL + pass;
 
       //console.log(result[0]["logo"]);
       let encryptedSVG = result[0]["logo"];
-      await decryptAndPlaceSVG(encryptedSVG,pass, "savedLogo");
+      await decryptAndPlaceSVG(encryptedSVG, pass, "savedLogo");
       // In real usage, decrypt the actual API endpoint with the password:
-      
+
       // Start building out the skeletons, then fetch data
       buildSkeletons();
 
@@ -797,7 +799,19 @@
       loadQuickLinks();
 
       // Load Live tab data
-      loadLiveLinks(baseURL+"&path=system/live.json");
+      loadLiveLinks(baseURL + "&path=system/live.json");
+
+      document.getElementById("savedbtn").addEventListener("focus", function () {
+        buildSkeletons();
+        loadQuickLinks();
+      });
+      document.getElementById("livebtn").addEventListener("focus", function () {
+        buildSkeletons();
+        loadLiveLinks(baseURL + "&path=system/live.json");
+      });
+      // document.getElementById("notesbtn").addEventListener("focus", function () {
+      //   loadQuickLinks();
+      // });
     }
 
     /* ===========================================================
