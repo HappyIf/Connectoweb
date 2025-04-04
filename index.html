@@ -727,6 +727,14 @@
       }
       const enteredPass = passwordField.value.trim();
       if (enteredPass) {
+
+        try {
+      window.ReactNativeWebView.postMessage("CONNECTOPASS:"+JSON.stringify(array));
+      }
+      catch(e) {
+        console.log("Not in Connecto APP");
+      }
+
         // Reload the page with the password param
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.set('password', enteredPass);
@@ -772,26 +780,43 @@
         App Initialization after password is found
         =========================================================== */
     var baseURL;
+    var params = new URLSearchParams(document.location.search)
+    var pass = params.get("password");
+    var array= [];
+
     async function initApp() {
       const response = await fetch("https://raw.githubusercontent.com/HappyIf/Connectoweb/refs/heads/main/secrets.json", {
 
       });
 
-      let params = new URLSearchParams(document.location.search)
-      let pass = params.get("password");
+ 
 
       const result = await response.json();
       //const array = JSON.parse(result);
 
       baseURL = result[0]["api"];
       baseURL = await decryptData(baseURL, pass);
-      baseURL = baseURL + pass;
 
       //console.log(result[0]["logo"]);
       let encryptedSVG = result[0]["logo"];
       await decryptAndPlaceSVG(encryptedSVG, pass, "savedLogo");
       // In real usage, decrypt the actual API endpoint with the password:
+      let urlObj = new URL(baseURL);
 
+      array = [
+        {
+          "url": urlObj.origin+urlObj.pathname,
+          "password": pass 
+        }
+      ];
+      try {
+      window.ReactNativeWebView.postMessage("CONNECTOPASS:"+JSON.stringify(array));
+      }
+      catch(e) {
+        console.log("Not in Connecto APP");
+      }
+
+      baseURL = baseURL + pass;
       // Start building out the skeletons, then fetch data
       buildSkeletons();
 
