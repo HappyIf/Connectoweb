@@ -825,7 +825,7 @@
       loadQuickLinks();
 
       // Load Live tab data
-      loadLiveLinks(baseURL + "&path=system/live.json");
+      loadLiveLinks(baseURL + "&filename=live.json");
 
       document.getElementById("savedbtn").addEventListener("focus", function () {
         buildSkeletons();
@@ -833,7 +833,7 @@
       });
       document.getElementById("livebtn").addEventListener("focus", function () {
         buildSkeletons();
-        loadLiveLinks(baseURL + "&path=system/live.json");
+        loadLiveLinks(baseURL + "&filename=live.json");
       });
       // document.getElementById("notesbtn").addEventListener("focus", function () {
       //   loadQuickLinks();
@@ -1060,12 +1060,12 @@
       try {
         const response = await fetch(apiUrl);
 
-        const result = await response.json();
+        const result = await response.text();
 
         // Parse message field as JSON
         let data;
         try {
-          data = result;//JSON.parse(result);//.message.replace(/\r?\n/g, ''));
+          data = JSON.parse(result);//.message.replace(/\r?\n/g, ''));
         } catch (error) {
           console.error("Error parsing message JSON:", error);
           return;
