@@ -1065,7 +1065,7 @@
         // Parse message field as JSON
         let data;
         try {
-          data = JSON.parse(result);//.message.replace(/\r?\n/g, ''));
+          data = result;//JSON.parse(result);//.message.replace(/\r?\n/g, ''));
         } catch (error) {
           console.error("Error parsing message JSON:", error);
           return;
