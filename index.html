@@ -816,7 +816,7 @@
       catch (e) {
         console.log("Not in Connecto APP");
       }
-
+      console.log(baseURL.slice(-8));
       baseURL = baseURL + "?password=" + pass;
       // Start building out the skeletons, then fetch data
       buildSkeletons();
