@@ -729,11 +729,11 @@
       if (enteredPass) {
 
         try {
-      window.ReactNativeWebView.postMessage("CONNECTOPASS:"+JSON.stringify(array));
-      }
-      catch(e) {
-        console.log("Not in Connecto APP");
-      }
+          window.ReactNativeWebView.postMessage("CONNECTOPASS:" + JSON.stringify(array));
+        }
+        catch (e) {
+          console.log("Not in Connecto APP");
+        }
 
         // Reload the page with the password param
         const newUrl = new URL(window.location.href);
@@ -782,15 +782,15 @@
     var baseURL;
     var params = new URLSearchParams(document.location.search)
     var pass = params.get("password");
-    var array= [];
+    var array = [];
 
     async function initApp() {
       /*this file will not work unless published to GitHub as we are using it as a raw link*/
       const response = await fetch(`https://raw.githubusercontent.com/HappyIf/Connectoweb/refs/heads/main/secrets.json?t=${Date.now()}`, {
-           cache: "no-store"
+        cache: "no-store"
       });
 
- 
+
 
       const result = await response.json();
       //const array = JSON.parse(result);
@@ -806,18 +806,18 @@
 
       array = [
         {
-          "url": urlObj.origin+urlObj.pathname,
-          "password": pass 
+          "url": urlObj.origin + urlObj.pathname,
+          "password": pass
         }
       ];
       try {
-      window.ReactNativeWebView.postMessage("CONNECTOPASS:"+JSON.stringify(array));
+        window.ReactNativeWebView.postMessage("CONNECTOPASS:" + JSON.stringify(array));
       }
-      catch(e) {
+      catch (e) {
         console.log("Not in Connecto APP");
       }
 
-      baseURL = baseURL +"?password="+ pass;
+      baseURL = baseURL + "?password=" + pass;
       // Start building out the skeletons, then fetch data
       buildSkeletons();
 
@@ -1153,12 +1153,18 @@
     function handleItemSelect(eventType, link) {
       if (eventType === 'click') {
         // Normal click -> open link
-        window.open(link, '_blank');
+        window.location.href = link;
       } else if (eventType === 'fastForward') {
         // Fast-forward key pressed -> do something else
         console.log('Fast-forward event on link:', link);
         // e.g. show a context menu, or load preview, etc.
-        alert('Fast-forward key event triggered for ' + link);
+        //alert('Fast-forward key event triggered for ' + link);
+        try {
+          window.ReactNativeWebView.postMessage("CONNECTOSURL:" + link);
+        }
+        catch (e) {
+          console.log("Not in Connecto APP");
+        }
       }
     }
 
