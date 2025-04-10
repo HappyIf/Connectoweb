@@ -268,6 +268,8 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 3rem;
+      overflow-y: auto;
+      height: 80vh;
     }
 
     .live-tile {
@@ -300,8 +302,8 @@
       width: 100%;
       height: auto;
       /* Blur effect */
-      filter: blur(10px);
-      -webkit-filter: blur(10px);
+      filter: blur(10px) brightness(70%);
+      -webkit-filter: blur(10px) brightness(70%);
       /* For Safari */
     }
 
@@ -330,6 +332,17 @@
     .live-tile-title {
       font-size: 0.9rem;
       margin-bottom: 0.25rem;
+      display: block;
+      /* Ensures it behaves like a block element */
+      width: 25ch;
+      /* Limits the text to about 35 characters */
+      white-space: nowrap;
+      /* Prevents wrapping */
+      overflow: hidden;
+      /* Hides the overflowing text */
+      text-overflow: ellipsis;
+      /* Adds "..." at the end */
+
     }
 
     .live-tile-meta {
@@ -502,6 +515,7 @@
     <div class="tab-content" id="notesTab">
       <div class="notes-content">
         Under development...
+        <div id="apiID"></div>
       </div>
     </div>
 
@@ -816,7 +830,8 @@
       catch (e) {
         console.log("Not in Connecto APP");
       }
-      console.log(baseURL.slice(-8));
+      console.log(baseURL.slice(-10));
+      document.getElementById("apiID").innerText=baseURL.slice(-10);
       baseURL = baseURL + "?password=" + pass;
       // Start building out the skeletons, then fetch data
       buildSkeletons();
@@ -846,6 +861,7 @@
     function buildSkeletons() {
       // Saved Tab skeleton (quick links)
       const quickLinksContainer = document.getElementById('quickLinks');
+      quickLinksContainer.innerHTML = "";
       for (let i = 0; i < 5; i++) {
         const skel = document.createElement('div');
         skel.classList.add('quick-link', 'skeleton');
@@ -854,6 +870,7 @@
 
       // Live tab skeleton
       const liveGrid = document.getElementById('liveGrid');
+      liveGrid.innerHTML = "";
       for (let i = 0; i < 6; i++) {
         const tile = document.createElement('div');
         tile.classList.add('live-tile', 'skeleton');
@@ -889,10 +906,18 @@
 
         // Mock data
         const data = [
-          { name: 'Google', link: 'https://google.com' },
-          { name: 'GitHub', link: 'https://github.com' },
-          { name: 'Stack', link: 'https://stackoverflow.com' },
-          { name: 'Reddit', link: 'https://reddit.com' },
+          {
+            "name": "Google",
+            "link": "https://google.com"
+          },
+          {
+            "name": "Youtube",
+            "link": "https://youtube.com"
+          },
+          {
+            "name": "PW",
+            "link": "https://pw.live"
+          }
         ];
 
         data.forEach((item, index) => {
@@ -1056,6 +1081,35 @@
          });
        
      }*/
+
+     function formatRelativeTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    
+    const diffMs = now - date;
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    const options = { weekday: 'long', hour: '2-digit', minute: '2-digit', hour12: true };
+    
+    if (diffSeconds < 60) {
+        return `${diffSeconds} seconds ago`;
+    } else if (diffMinutes < 60) {
+        return `${diffMinutes} minutes ago`;
+    } else if (diffHours < 24 && date.getDate() === now.getDate()) {
+        return `${diffHours} hours ago`;
+    } else if (diffDays === 1) {
+        return `Yesterday at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+    } else if (diffDays < 7) {
+        return `${date.toLocaleDateString([], options)}`;
+    } else {
+        return date.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+}
+
+
     async function loadLiveLinks(apiUrl) {
       try {
         const response = await fetch(apiUrl);
@@ -1074,6 +1128,8 @@
         // Remove skeleton
         const liveGrid = document.getElementById('liveGrid');
         liveGrid.innerHTML = '';
+        
+        data = data.reverse();
 
         data.forEach((item, index) => {
           const tile = document.createElement('div');
@@ -1092,7 +1148,7 @@
           const os = item.device;
           const deviceInfoDiv = document.createElement("div");
           deviceInfoDiv.classList.add("device-info");
-          let deviceIcon = "question_mark";
+          let deviceIcon = "output";
           let str = "";
 
           if (os.toLowerCase().includes("android") && os.includes("FT") && os.includes("TV")) {
@@ -1123,7 +1179,8 @@
           // Meta Info
           const metaDiv = document.createElement('div');
           metaDiv.classList.add('live-tile-meta');
-          metaDiv.textContent = `Time: ${item.time}`;
+          var relTime = formatRelativeTime(item.time);
+          metaDiv.textContent = `${relTime}`;
 
           // Build structure
           tile.appendChild(imgDiv);
