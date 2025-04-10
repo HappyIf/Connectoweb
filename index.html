@@ -278,6 +278,7 @@
       padding: 0.5rem;
       cursor: pointer;
       max-width: 250px;
+      max-height: 200px;
     }
 
     .live-tile:focus {
@@ -842,11 +843,11 @@
       // Load Live tab data
       loadLiveLinks(baseURL + "&filename=live.json");
 
-      document.getElementById("savedbtn").addEventListener("focus", function () {
+      document.getElementById("savedbtn").addEventListener("focusin", function () {
         buildSkeletons();
         loadQuickLinks();
       });
-      document.getElementById("livebtn").addEventListener("focus", function () {
+      document.getElementById("livebtn").addEventListener("focusin", function () {
         buildSkeletons();
         loadLiveLinks(baseURL + "&filename=live.json");
       });
