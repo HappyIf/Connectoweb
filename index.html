@@ -8,6 +8,8 @@
   <title>Connecto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="background.css">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+
 
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -491,9 +493,10 @@
       gap: 0.5rem;
       margin-top: 1rem;
     }
+
     .active-live-link {
-      background: var(--gradient-color)!important; 
-      background-clip: text!important;
+      background: var(--gradient-color) !important;
+      background-clip: text !important;
     }
   </style>
 </head>
@@ -578,15 +581,6 @@
     /* ===========================================================
         Utility / Mock / Placeholder Functions
         =========================================================== */
-
-    function darkreaderDisable() {
-      try {
-        DarkReader.disable();
-      } catch (error) {
-        console.log("Not using DarkReader");
-      }
-    }
-    darkreaderDisable();
 
     // Import CryptoJS library for AES encryption/decryption
     // Assuming it's included via a <script> tag before this code
