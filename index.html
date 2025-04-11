@@ -3,8 +3,9 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Dark Themed Web App</title>
+  <title>Connecto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="background.css">
 
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -12,12 +13,26 @@
   <style>
     /* === Global Styles === */
     :root {
-      --bg-color: #1e1e1e;
-      --fg-color: #f0f0f0;
-      --accent-color: #2d2d2d;
+      --bg-color: #00000000;
+      --fg-color: #f0f0f0e8;
+      --accent-items-color: #2e3c5121;
+      --accent-color: #2e3c5100;
+      --background: #17202d;
       --border-radius: 8px;
-      --skeleton-color: #2a2a2a;
-      --skeleton-highlight: #3a3a3a;
+      --skeleton-color: #26354d50;
+      --skeleton-highlight: #26354d77;
+      --button-color: #26354d50;
+      /*10151d*/
+      --new-color: #041124;
+      --gradient-color: linear-gradient(45deg,
+          #d16ba5 0%,
+          #b857c6 15%,
+          #9654d3 30%,
+          #6b68eb 45%,
+          #3380f5 60%,
+          #0098ff 75%,
+          #00caff 90%,
+          #5ffbf1 100%);
     }
 
     * {
@@ -55,7 +70,7 @@
       /* outline: 2px solid #888; */
       transform: scale(1.3);
       /* Slightly zoom in */
-      box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 2px rgba(22, 27, 58, 0.5);
       /* Add a subtle elevation effect */
       transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
       /* Smooth transition for the effects */
@@ -89,14 +104,14 @@
       flex: 0 0 auto;
       border-radius: var(--border-radius);
       padding: 0.5rem 1rem;
-      background: #333;
+      background: var(--button-color);
       color: var(--fg-color);
       border: none;
       cursor: pointer;
     }
 
     .tab-button.active {
-      background: #444;
+      background: var(--button-color);
     }
 
     /* === Body container for each tab's content === */
@@ -153,7 +168,7 @@
       width: 80px;
       text-align: center;
       border-radius: var(--border-radius);
-      background: #333;
+      background: var(--button-color);
       padding: 0.5rem;
       cursor: pointer;
       user-select: none;
@@ -170,7 +185,7 @@
       height: 40px;
       margin: 0 auto;
       border-radius: 50%;
-      background: #555;
+      background: var(--button-color);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -190,12 +205,13 @@
 
     .customise-btn {
       margin-top: 1rem;
-      background: #444;
+      background: var(--button-color);
+      opacity: 0;
     }
 
     .add-link-btn {
       margin-top: 1rem;
-      background: #555;
+      background: var(--button-color);
       display: none;
     }
 
@@ -273,7 +289,7 @@
     }
 
     .live-tile {
-      background: #333;
+      background: var(--button-color);
       border-radius: var(--border-radius);
       padding: 0.5rem;
       cursor: pointer;
@@ -289,7 +305,7 @@
     .live-tile-img {
       width: 100%;
       height: 100px;
-      background: #555;
+      background: var(--button-color);
       margin-bottom: 0.5rem;
       border-radius: var(--border-radius);
       overflow: hidden;
@@ -320,6 +336,7 @@
       font-size: 12px;
       font-weight: bold;
       color: #ffffff;
+      background: #ffffff;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
       display: flex;
       align-items: center;
@@ -327,6 +344,10 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       max-width: 100%;
+
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
 
@@ -395,7 +416,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.8);
+      background: #00000000;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -403,7 +424,7 @@
     }
 
     .modal {
-      background: var(--accent-color);
+      background: var(--button-color);
       padding: 1rem;
       border-radius: var(--border-radius);
       display: flex;
@@ -416,8 +437,8 @@
       width: 100%;
       padding: 0.5rem;
       border-radius: var(--border-radius);
-      border: 1px solid #444;
-      background: #222;
+      border: 1px solid var(--button-color);
+      background: var(--new-color);
       color: #fff;
     }
 
@@ -457,7 +478,7 @@
       width: 100%;
       padding: 0.5rem;
       border-radius: var(--border-radius);
-      border: 1px solid #444;
+      border: 1px solid var(--button-color);
       background: #222;
       color: #fff;
     }
@@ -472,80 +493,81 @@
 </head>
 
 <body>
+  <main class="md:relative min-h-screen flex flex-col justify-between overflow-x-clip md:grow">
+    <div class="shine -z-10 absolute inset-0" role="presentation"></div>
+    <div class="app-container">
 
-  <div class="app-container">
+      <div class="tabs">
+        <br />
+        <button id="savedbtn" class="tab-button active" data-tab="saved" tabindex="2">Saved</button>
+        <button id="livebtn" class="tab-button" data-tab="live" tabindex="3">Live</button>
+        <button id="notesbtn" class="tab-button" data-tab="notes" tabindex="4">Notes</button>
+        <br />
+      </div>
 
-    <div class="tabs">
-      <br />
-      <button id="savedbtn" class="tab-button active" data-tab="saved" tabindex="2">Saved</button>
-      <button id="livebtn" class="tab-button" data-tab="live" tabindex="3">Live</button>
-      <button id="notesbtn" class="tab-button" data-tab="notes" tabindex="4">Notes</button>
-      <br />
-    </div>
+      <div class="tab-content active" id="savedTab">
+        <div class="saved-content">
+          <div class="saved-logo" id="savedLogo" tabindex="1">
 
-    <div class="tab-content active" id="savedTab">
-      <div class="saved-content">
-        <div class="saved-logo" id="savedLogo" tabindex="-1">
+          </div>
 
+          <div class="quick-links" id="quickLinks">
+          </div>
+
+          <div class="drop-zone" id="dropZone">
+            <p>Drag & drop to reorder your links</p>
+          </div>
+
+          <button class="customise-btn" id="customiseBtn" tabindex="">
+            <span class="material-symbols-outlined" style="vertical-align:middle;">edit</span>
+            Customise
+          </button>
+
+          <button class="add-link-btn" id="addLinkBtn">
+            <span class="material-symbols-outlined" style="vertical-align:middle;">add</span>
+            Add Link
+          </button>
         </div>
+      </div>
 
-        <div class="quick-links" id="quickLinks">
+      <div class="tab-content" id="liveTab">
+        <div class="live-grid" id="liveGrid">
         </div>
+      </div>
 
-        <div class="drop-zone" id="dropZone">
-          <p>Drag & drop to reorder your links</p>
+      <div class="tab-content" id="notesTab">
+        <div class="notes-content">
+          Under development...
+          <div id="apiID"></div>
         </div>
+      </div>
 
-        <button class="customise-btn" id="customiseBtn" tabindex="">
-          <span class="material-symbols-outlined" style="vertical-align:middle;">edit</span>
-          Customise
-        </button>
+    </div>
 
-        <button class="add-link-btn" id="addLinkBtn">
-          <span class="material-symbols-outlined" style="vertical-align:middle;">add</span>
-          Add Link
-        </button>
+    <div class="modal-backdrop" id="passwordModal" style="display: none;">
+      <div class="modal">
+        <h3>Enter Password</h3>
+        <form onsubmit="passwordSubmission(event)">
+          <input type="password" id="passwordField" />
+          <button id="passwordSubmitBtn">Submit</button>
+        </form>
       </div>
     </div>
 
-    <div class="tab-content" id="liveTab">
-      <div class="live-grid" id="liveGrid">
+    <div class="edit-link-modal-backdrop" id="editLinkModal" style="display: none;">
+      <div class="edit-link-modal">
+        <h3>Edit Link</h3>
+        <label for="editLinkText">Text:</label>
+        <input type="text" id="editLinkText" />
+        <label for="editLinkUrl">URL:</label>
+        <input type="url" id="editLinkUrl" />
+        <div class="modal-buttons">
+          <button id="editLinkCancelBtn">Cancel</button>
+          <button id="editLinkSaveBtn">Save</button>
+        </div>
       </div>
     </div>
-
-    <div class="tab-content" id="notesTab">
-      <div class="notes-content">
-        Under development...
-        <div id="apiID"></div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="modal-backdrop" id="passwordModal" style="display: none;">
-    <div class="modal">
-      <h3>Enter Password</h3>
-      <form onsubmit="passwordSubmission(event)">
-        <input type="password" id="passwordField" />
-        <button id="passwordSubmitBtn">Submit</button>
-      </form>
-    </div>
-  </div>
-
-  <div class="edit-link-modal-backdrop" id="editLinkModal" style="display: none;">
-    <div class="edit-link-modal">
-      <h3>Edit Link</h3>
-      <label for="editLinkText">Text:</label>
-      <input type="text" id="editLinkText" />
-      <label for="editLinkUrl">URL:</label>
-      <input type="url" id="editLinkUrl" />
-      <div class="modal-buttons">
-        <button id="editLinkCancelBtn">Cancel</button>
-        <button id="editLinkSaveBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
+  </main>
   <script>
     /* ===========================================================
         Utility / Mock / Placeholder Functions
@@ -642,6 +664,8 @@
         const textEncoder = new TextEncoder();
         const passwordBytes = textEncoder.encode(password);
 
+        //console.log(passwordBytes);
+
         // Derive the key
         const passwordKey = await window.crypto.subtle.importKey(
           'raw',
@@ -673,6 +697,7 @@
         //console.log(decryptedString);
         return decryptedString;
       } catch (error) {
+        passwordModal.style.display = 'flex';
         console.error('Decryption failed:', error);
       }
     }
@@ -786,7 +811,7 @@
         const focused = document.activeElement;
         if (focused && focused.dataset && focused.dataset.link && !editMode) {
           // If the item has a data-link, handle fast-forward action
-          handleItemSelect('fastForward', focused.dataset.link);
+          handleItemSelect('fastForward', focused.dataset.link, focused);
         }
       }
     });
@@ -832,16 +857,18 @@
         console.log("Not in Connecto APP");
       }
       console.log(baseURL.slice(-10));
-      document.getElementById("apiID").innerText=baseURL.slice(-10);
+      document.getElementById("apiID").innerText = baseURL.slice(-10);
       baseURL = baseURL + "?password=" + pass;
       // Start building out the skeletons, then fetch data
       buildSkeletons();
 
+      if (!navigator.userAgent.includes("AFT"))
+        document.getElementById("customiseBtn").style.opacity = 1;
       // Load quick links for Saved tab
       loadQuickLinks();
 
       // Load Live tab data
-      loadLiveLinks(baseURL + "&filename=live.json");
+      //loadLiveLinks(baseURL + "&filename=live.json");
 
       document.getElementById("savedbtn").addEventListener("focusin", function () {
         buildSkeletons();
@@ -1083,32 +1110,32 @@
        
      }*/
 
-     function formatRelativeTime(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    
-    const diffMs = now - date;
-    const diffSeconds = Math.floor(diffMs / 1000);
-    const diffMinutes = Math.floor(diffSeconds / 60);
-    const diffHours = Math.floor(diffMinutes / 60);
-    const diffDays = Math.floor(diffHours / 24);
+    function formatRelativeTime(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
 
-    const options = { weekday: 'long', hour: '2-digit', minute: '2-digit', hour12: true };
-    
-    if (diffSeconds < 60) {
+      const diffMs = now - date;
+      const diffSeconds = Math.floor(diffMs / 1000);
+      const diffMinutes = Math.floor(diffSeconds / 60);
+      const diffHours = Math.floor(diffMinutes / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      const options = { weekday: 'long', hour: '2-digit', minute: '2-digit', hour12: true };
+
+      if (diffSeconds < 60) {
         return `${diffSeconds} seconds ago`;
-    } else if (diffMinutes < 60) {
+      } else if (diffMinutes < 60) {
         return `${diffMinutes} minutes ago`;
-    } else if (diffHours < 24 && date.getDate() === now.getDate()) {
+      } else if (diffHours < 24 && date.getDate() === now.getDate()) {
         return `${diffHours} hours ago`;
-    } else if (diffDays === 1) {
+      } else if (diffDays === 1) {
         return `Yesterday at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`;
-    } else if (diffDays < 7) {
+      } else if (diffDays < 7) {
         return `${date.toLocaleDateString([], options)}`;
-    } else {
+      } else {
         return date.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+      }
     }
-}
 
 
     async function loadLiveLinks(apiUrl) {
@@ -1129,7 +1156,7 @@
         // Remove skeleton
         const liveGrid = document.getElementById('liveGrid');
         liveGrid.innerHTML = '';
-        
+
         data = data.reverse();
 
         data.forEach((item, index) => {
@@ -1208,7 +1235,9 @@
     // Call function with API URL
     // loadLiveLinks("https://api.com/getrequest");
 
-    function handleItemSelect(eventType, link) {
+    function handleItemSelect(eventType, link, ele) {
+      document.querySelectorAll(".device-info.active").forEach(el => el.classList.remove("active"));
+      ele.querySelector(".device-info").classList.add("active");
       if (eventType === 'click') {
         // Normal click -> open link
         window.location.href = link;
