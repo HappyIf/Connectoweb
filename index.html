@@ -489,6 +489,10 @@
       gap: 0.5rem;
       margin-top: 1rem;
     }
+    .active-live-link {
+      background: var(--gradient-color)!important; 
+      background-clip: text!important;
+    }
   </style>
 </head>
 
@@ -1236,8 +1240,8 @@
     // loadLiveLinks("https://api.com/getrequest");
 
     function handleItemSelect(eventType, link, ele) {
-      document.querySelectorAll(".device-info.active").forEach(el => el.classList.remove("active"));
-      ele.querySelector(".device-info").classList.add("active");
+      document.querySelectorAll(".device-info.active-live-link").forEach(el => el.classList.remove("active-live-link"));
+      ele.querySelector(".device-info").classList.add("active-live-link");
       if (eventType === 'click') {
         // Normal click -> open link
         window.location.href = link;
