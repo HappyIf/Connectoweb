@@ -291,8 +291,21 @@ async function initApp() {
   // Start building out the skeletons, then fetch data
   buildSkeletons();
 
-  if (!navigator.userAgent.includes("AFT"))
+  if (!navigator.userAgent.includes("AFT")) {
     document.getElementById("customiseBtn").style.opacity = 1;
+  } else {
+    document.querySelector(".shine").remove();
+
+    var style = document.createElement('style');
+    style.textContent = `
+       main::after {
+       animation: none!important;
+       }
+    `;
+    document.head.appendChild(style);
+
+  }
+
   // Load quick links for Saved tab
   loadQuickLinks();
 

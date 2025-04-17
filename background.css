@@ -1030,6 +1030,7 @@ main:not(.no-dots):after {
     }
 }
 
+
 .after\:content-\[\'\~\>\'\]:after {
     --tw-content: "~>";
     content: var(--tw-content)
