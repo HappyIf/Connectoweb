@@ -42,7 +42,7 @@
           #00caff 90%,
           #5ffbf1 100%);
     }
-   
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -50,7 +50,7 @@
       outline: none;
       font-family: sans-serif;
     }
-    
+
     #passwordSubmitBtn {
       margin-top: 30px;
       background: var(--button-color);
@@ -132,7 +132,8 @@
     }
 
     .tab-button.active {
-      background: var(--button-color);
+      background: #26354d9e;
+      /*background: var(--button-color); */
     }
 
     /* === Body container for each tab's content === */
@@ -308,6 +309,22 @@
       gap: 3rem;
       /* overflow-y: auto; */
       /* height: 80vh; */
+    }
+
+    /* For tablets, desktops, and larger screens */
+    @media (min-width: 768px) {
+      .live-grid {
+        gap: 3rem;
+        /* Keep the large gap for larger screens */
+      }
+    }
+
+    /* For smaller screens like phones */
+    @media (max-width: 767px) {
+      .live-grid {
+        gap: 1rem;
+        /* Reduce the gap for smaller screens */
+      }
     }
 
     .live-tile {
