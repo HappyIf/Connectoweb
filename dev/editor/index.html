@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Connecto Script Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #181a20;
+            margin: 0;
+            padding: 0;
+            color: #f1f1f1;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toolbar {
+            background: #0c162d;
+            /* activityBar.background */
+            border-bottom: 1px solid #070d1a00;
+            /* activityBar.border */
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px #0004;
+            z-index: 2;
+            color: #c9d1d9;
+            /* activityBar.foreground */
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-btn, button#formatBtn {
+            background: #0c162d;
+            border: 1px solid #070d1a;
+            color: #c9d1d9;
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-right: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s, border 0.2s;
+        }
+
+        .menu-btn:hover, button#formatBtn:hover {
+            background: #172237;
+            border-color: #30363d;
+        }
+
+        #editor-container {
+            flex: 1;
+            min-height: 0;
+            height: 1px;
+            width: 100vw;
+            max-width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Modal styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0c162dcc;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-backdrop.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #172237;
+            border: 1px solid #070d1a;
+            border-radius: 10px;
+            box-shadow: 0 4px 32px #000a;
+            padding: 32px 28px 24px 28px;
+            min-width: 260px;
+            color: #c9d1d9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            background: #1f6feb;
+            color: #f0f6fc;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 22px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-btn:hover {
+            background: #2383f1;
+        }
+
+        .modal-btn.cancel {
+            background: #0c162d;
+            color: #8b949e;
+            border: 1px solid #30363d;
+        }
+
+        .modal-btn.cancel:hover {
+            background: #172237;
+            color: #c9d1d9;
+        }
+
+        @media (max-width: 600px) {
+            .toolbar {
+                padding: 10px 6px;
+            }
+
+            #editor-container {
+                width: 100vw;
+                min-width: 0;
+            }
+
+            .modal-content {
+                min-width: 180px;
+                padding: 18px 8px 12px 8px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/editor/editor.main.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+</head>
+
+<body>
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <button class="menu-btn" id="menuBtn" title="Menu" aria-label="Menu">
+                <!-- Hamburger icon -->
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                    <rect y="4" width="22" height="2.5" rx="1.25" fill="#c9d1d9" />
+                    <rect y="9.25" width="22" height="2.5" rx="1.25" fill="#c9d1d9" />
+                    <rect y="14.5" width="22" height="2.5" rx="1.25" fill="#c9d1d9" />
+                </svg>
+            </button>
+        </div>
+        <button id="formatBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                <path
+                    d="M440-80q-33 0-56.5-23.5T360-160v-160H240q-33 0-56.5-23.5T160-400v-280q0-66 47-113t113-47h480v440q0 33-23.5 56.5T720-320H600v160q0 33-23.5 56.5T520-80h-80ZM240-560h480v-200h-40v160h-80v-160h-40v80h-80v-80H320q-33 0-56.5 23.5T240-680v120Zm0 160h480v-80H240v80Zm0 0v-80 80Z" />
+            </svg>
+        </button>
+    </div>
+    <div id="editor-container"></div>
+
+    <!-- Modal -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal-content">
+            <div style="font-size:1.15rem; font-weight:500; margin-bottom:10px;">Menu</div>
+            <div class="modal-actions">
+                <button class="modal-btn save" id="modalSaveBtn">Save</button>
+                <button class="modal-btn cancel" id="modalCancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' } });
+
+        // Load the theme.json file
+        fetch('theme.json')
+            .then(response => response.json())
+            .then(theme => {
+                require(['vs/editor/editor.main'], function () {
+                    // Register the custom theme
+                    monaco.editor.defineTheme('custom-vscode-theme', {
+                        base: theme.type === 'dark' ? 'vs-dark' : 'vs',
+                        inherit: true,
+                        rules: (theme.tokenColors || []).map(token => ({
+                            token: Array.isArray(token.scope) ? token.scope.join(',') : token.scope,
+                            foreground: token.settings.foreground ? token.settings.foreground.replace('#', '') : undefined,
+                            background: token.settings.background ? token.settings.background.replace('#', '') : undefined,
+                            fontStyle: token.settings.fontStyle
+                        })),
+                        colors: theme.colors || {}
+                    });
+
+                    // Create the editor with the custom theme
+                    window.editor = monaco.editor.create(document.getElementById('editor-container'), {
+                        value: `function helloWorld() {\n  console.log("Hello, world!");\n}`,
+                        language: 'javascript',
+                        theme: 'custom-vscode-theme',
+                        fontSize: 16,
+                        minimap: { enabled: false },
+                        automaticLayout: true,
+                        scrollBeyondLastLine: false,
+                        wordWrap: 'on',
+                    });
+                });
+            });
+
+        document.getElementById('formatBtn').onclick = function () {
+            if (window.editor) {
+                window.editor.getAction('editor.action.formatDocument').run();
+            }
+        };
+
+        // Modal logic
+        const menuBtn = document.getElementById('menuBtn');
+        const modalBackdrop = document.getElementById('modalBackdrop');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        const modalSaveBtn = document.getElementById('modalSaveBtn');
+
+        menuBtn.onclick = () => {
+            modalBackdrop.classList.add('active');
+        };
+        modalCancelBtn.onclick = () => {
+            modalBackdrop.classList.remove('active');
+        };
+        modalBackdrop.onclick = (e) => {
+            if (e.target === modalBackdrop) {
+                modalBackdrop.classList.remove('active');
+            }
+        };
+        modalSaveBtn.onclick = () => {
+            // Add your save logic here
+            modalBackdrop.classList.remove('active');
+            alert('Save clicked!');
+        };
+
+        // Responsive height
+        function resizeEditor() {
+            const toolbarHeight = document.querySelector('.toolbar').offsetHeight;
+            document.getElementById('editor-container').style.height = (window.innerHeight - toolbarHeight) + 'px';
+        }
+        window.addEventListener('resize', resizeEditor);
+        window.addEventListener('DOMContentLoaded', resizeEditor);
+    </script>
+</body>
+
+</html>

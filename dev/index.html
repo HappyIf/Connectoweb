@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Connectoweb Domains</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    body {
+      background: #181a20;
+      color: #f1f1f1;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      margin: 40px 0 32px 0;
+      color: #6cf;
+      letter-spacing: 2px;
+    }
+    .domain-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto;
+      width: 98%;
+      max-width: 800px;
+    }
+    .domain-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #22242b;
+      margin: 0 auto 16px auto;
+      padding: 18px 24px;
+      border-radius: 10px;
+      transition: background 0.2s;
+      max-width: 800px;
+      box-shadow: 0 2px 8px #0004;
+    }
+    .domain-item:hover {
+      background: #2a2d36;
+    }
+    .domain-info {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      margin-left: 16px;
+    }
+    .domain-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+    .domain-date {
+      font-size: 0.95rem;
+      color: #8fa1b3;
+    }
+    .domain-icons {
+      display: flex;
+      gap: 18px;
+      font-size: 1.6rem;
+      margin-left: 24px;
+      margin-right: 12px;
+    }
+    .icon-login {
+      color: #6cf;
+      cursor: pointer;
+    }
+    .icon-script {
+      color: #f9d923;
+      cursor: pointer;
+    }
+    .material-icons {
+      vertical-align: middle;
+      font-size: 1.6rem;
+      user-select: none;
+    }
+    .icon-actions {
+      color: #b0b8c1;
+      cursor: pointer;
+      font-size: 2rem;
+      margin-right: 8px;
+      transition: color 0.2s;
+    }
+    .icon-actions:hover {
+      color: #6cf;
+    }
+    /* Bottom sheet styles */
+    .bottom-sheet-backdrop {
+      position: fixed;
+      left: 0; right: 0; top: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 1000;
+      display: none;
+      transition: background 0.2s;
+    }
+    .bottom-sheet {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      background: #23272f;
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -4px 32px #000a;
+      padding: 24px 0 12px 0;
+      z-index: 1001;
+      max-width: 480px;
+      margin: 0 auto;
+      transform: translateY(100%);
+      transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+    }
+    .bottom-sheet.open {
+      transform: translateY(0);
+    }
+    .bottom-sheet-backdrop.open {
+      display: block;
+    }
+    .sheet-option {
+      display: flex;
+      align-items: center;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      color: #f1f1f1;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 75%;
+      outline: none;
+      transition: background 0.15s;
+      gap: 18px;
+    }
+    .sheet-option:hover {
+      background: #2a2d36;
+    }
+    .sheet-icon {
+      font-size: 1.7rem;
+      color: #6cf;
+    }
+    .sheet-icon.delete {
+      color: #f44336;
+    }
+    .sheet-icon.edit {
+      color: #f9d923;
+    }
+    .sheet-icon.add {
+      color: #4caf50;
+    }
+    .sheet-icon.clean {
+      color: #00bcd4;
+    }
+    @media (max-width: 600px) {
+      .domain-item, .domain-list {
+        max-width: 100vw;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .bottom-sheet {
+        max-width: 100vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="placeholder" style="margin: 10px;"></div>
+  <ul class="domain-list" id="domainList"></ul>
+
+  <!-- Bottom Sheet -->
+  <div class="bottom-sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="bottom-sheet" id="bottomSheet"></div>
+
+  <script>
+    // Helper to get URL param
+    function getUrlParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    // Decrypt function (copy from script.js)
+    async function decryptData(encryptedData, password) {
+      if (typeof encryptedData !== 'string' || encryptedData.trim() === '' ||
+        typeof password !== 'string' || password.trim() === '') {
+        console.error('Invalid encrypted data or password provided for decryption.');
+        return;
+      }
+      try {
+        const encryptedArray = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+        const iv = encryptedArray.slice(0, 12);
+        const encryptedBytes = encryptedArray.slice(12);
+        const textEncoder = new TextEncoder();
+        const passwordBytes = textEncoder.encode(password);
+        const passwordKey = await window.crypto.subtle.importKey(
+          'raw',
+          passwordBytes,
+          { name: 'PBKDF2' },
+          false,
+          ['deriveKey']
+        );
+        const aesKey = await window.crypto.subtle.deriveKey(
+          {
+            name: 'PBKDF2',
+            salt: passwordBytes,
+            iterations: 100000,
+            hash: 'SHA-256'
+          },
+          passwordKey,
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+        const decryptedData = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, aesKey, encryptedBytes);
+        return new TextDecoder().decode(decryptedData);
+      } catch (error) {
+        console.error('Decryption failed:', error);
+      }
+    }
+
+    // Main logic to fetch and decrypt API URL, then fetch directories.json
+    (async function() {
+      const password = getUrlParam('password');
+      if (!password) {
+        alert('Password missing in URL!');
+        return;
+      }
+      // Fetch secrets.json
+      const secretsResp = await fetch('https://raw.githubusercontent.com/HappyIf/Connectoweb/refs/heads/main/secrets.json');
+      const secrets = await secretsResp.json();
+      const encryptedApiUrl = secrets[0].api;
+      // Decrypt API URL
+      const apiUrl = await decryptData(encryptedApiUrl, password);
+      // Build directories.json URL
+      const directoriesUrl = apiUrl + '?password=' + encodeURIComponent(password) + '&filename=directories.json';
+
+      // Show skeletons while loading
+      const domainList = document.getElementById('domainList');
+      domainList.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        const skeleton = document.createElement('li');
+        skeleton.className = 'domain-item';
+        skeleton.style.opacity = '0.6';
+        skeleton.innerHTML = `
+          <span class="material-icons icon-actions" style="background:#23272f;border-radius:50%;color:#444;">more_vert</span>
+          <div class="domain-info">
+            <div class="domain-name" style="background:#23272f;height:18px;width:120px;border-radius:4px;margin-bottom:6px;"></div>
+            <div class="domain-date" style="background:#23272f;height:14px;width:80px;border-radius:4px;"></div>
+          </div>
+          <div class="domain-icons">
+            <span class="material-icons" style="background:#23272f;border-radius:50%;color:#444;">lock</span>
+            <span class="material-icons" style="background:#23272f;border-radius:50%;color:#444;">code</span>
+          </div>
+        `;
+        domainList.appendChild(skeleton);
+      }
+
+      // Now fetch directories.json
+      let data = {};
+      fetch(directoriesUrl)
+        .then(response => response.json())
+        .then(json => {
+          data = json;
+          domainList.innerHTML = ''; // Remove skeletons
+          createList();
+        })
+        .catch(err => {
+          domainList.innerHTML = '';
+          console.error('Failed to fetch data:', err);
+        });
+
+      function formatDate(isoString) {
+        const date = new Date(isoString);
+        return date.toLocaleString(undefined, {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+      }
+
+      
+      const bottomSheet = document.getElementById('bottomSheet');
+      const sheetBackdrop = document.getElementById('sheetBackdrop');
+
+      // Helper to close sheet
+      function closeSheet() {
+        bottomSheet.classList.remove('open');
+        sheetBackdrop.classList.remove('open');
+        setTimeout(() => { bottomSheet.innerHTML = ''; }, 250);
+      }
+
+      // Add modal HTML to body
+const modalHtml = `
+  <div id="confirmModalBackdrop" style="display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);z-index:2000;"></div>
+  <div id="confirmModal" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#23272f;padding:32px 28px 24px 28px;border-radius:14px;box-shadow:0 4px 32px #000a;z-index:2001;max-width:90vw;">
+    <div id="confirmModalMsg" style="font-size:1.1rem;margin-bottom:24px;color:#f1f1f1;"></div>
+    <div style="display:flex;gap:24px;justify-content:center;">
+      <button id="confirmModalYes" style="padding:8px 28px;background:#6cf;color:#222;border:none;border-radius:6px;font-size:1rem;cursor:pointer;">Yes</button>
+      <button id="confirmModalNo" style="padding:8px 28px;background:#444;color:#fff;border:none;border-radius:6px;font-size:1rem;cursor:pointer;">No</button>
+    </div>
+  </div>
+`;
+document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+// Modal logic
+function showConfirmModal(message, onYes) {
+  const modal = document.getElementById('confirmModal');
+  const backdrop = document.getElementById('confirmModalBackdrop');
+  document.getElementById('confirmModalMsg').textContent = message;
+  modal.style.display = 'block';
+  backdrop.style.display = 'block';
+
+  function close() {
+    modal.style.display = 'none';
+    backdrop.style.display = 'none';
+    yesBtn.onclick = null;
+    noBtn.onclick = null;
+  }
+  const yesBtn = document.getElementById('confirmModalYes');
+  const noBtn = document.getElementById('confirmModalNo');
+  yesBtn.onclick = () => { close(); onYes(); };
+  noBtn.onclick = close;
+  backdrop.onclick = close;
+}
+
+      // Show bottom sheet with options
+      function showSheet(domain, info) {
+        let options = `
+          <button class="sheet-option" data-action="delete">
+            <span class="material-icons sheet-icon delete">delete</span>
+            Delete Domain
+          </button>
+          ${
+            'script' in info
+              ? `<button class="sheet-option" data-action="edit-script">
+                  <span class="material-icons sheet-icon edit">edit</span>
+                  Edit Script
+                </button>`
+              : `<button class="sheet-option" data-action="add-script">
+                  <span class="material-icons sheet-icon add">add</span>
+                  Add Script
+                </button>`
+          }
+          <button class="sheet-option" data-action="clean-login">
+            <span class="material-icons sheet-icon clean">cleaning_services</span>
+            Clean Login
+          </button>
+        `;
+        bottomSheet.innerHTML = options;
+        setTimeout(() => {
+          bottomSheet.classList.add('open');
+          sheetBackdrop.classList.add('open');
+        }, 10);
+
+        // Option click handlers
+        bottomSheet.querySelectorAll('.sheet-option').forEach(btn => {
+          btn.onclick = (e) => {
+            const action = btn.getAttribute('data-action');
+            if (action === 'delete') {
+              showConfirmModal(
+                `Are you sure you want to delete "${domain}"?`,
+                () => {
+                  // Call your delete function here
+                  alert(`Deleted: ${domain}`);
+                  closeSheet();
+                }
+              );
+            } else if (action === 'clean-login') {
+              showConfirmModal(
+                `Are you sure you want to clean up login of "${domain}"?`,
+                () => {
+                  // Call your clean login function here
+                  alert(`Cleaned login for: ${domain}`);
+                  closeSheet();
+                }
+              );
+            } else {
+              alert(`Action: ${action} for ${domain}`);
+              closeSheet();
+            }
+          };
+        });
+      }
+
+      // Close sheet on backdrop click
+      sheetBackdrop.onclick = closeSheet;
+
+      function createList() {
+
+      Object.entries(data).forEach(([domain, info]) => {
+        const li = document.createElement('li');
+        li.className = 'domain-item';
+
+        // Actions button (left)
+        const actionsBtn = document.createElement('span');
+        actionsBtn.className = 'material-icons icon-actions';
+        actionsBtn.title = 'Actions';
+        actionsBtn.textContent = 'more_vert';
+        actionsBtn.onclick = (e) => {
+          showSheet(domain, info);
+        };
+        li.appendChild(actionsBtn);
+
+        // Domain info
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'domain-info';
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'domain-name';
+        nameDiv.textContent = domain;
+
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'domain-date';
+        dateDiv.textContent = formatDate(info.latest);
+
+        infoDiv.appendChild(nameDiv);
+        infoDiv.appendChild(dateDiv);
+
+        // Icons
+        const iconsDiv = document.createElement('div');
+        iconsDiv.className = 'domain-icons';
+
+        if ('login' in info) {
+          const loginIcon = document.createElement('span');
+          loginIcon.className = 'material-icons icon-login';
+          loginIcon.title = 'Login present';
+          loginIcon.textContent = 'lock';
+          iconsDiv.appendChild(loginIcon);
+        }
+        if ('script' in info) {
+          const scriptIcon = document.createElement('span');
+          scriptIcon.className = 'material-icons icon-script';
+          scriptIcon.title = 'Script present';
+          scriptIcon.textContent = 'code';
+          iconsDiv.appendChild(scriptIcon);
+        }
+
+        li.appendChild(infoDiv);
+        li.appendChild(iconsDiv);
+        domainList.appendChild(li);
+      });
+
+      }
+
+      // Close sheet on ESC
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSheet();
+      });
+    })();
+  </script>
+</body>
+</html>
