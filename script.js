@@ -386,7 +386,7 @@ function loadQuickLinks(apiUrl) {
       },
       {
         "name": "PW",
-        "link": "https://pw.live"
+        "link": "https://www.pw.live/study/batches?batchChildUrl=%2Fbatches-new%2Fbatches%2F65dc6fbabb55350018d555b7%2Fbatch-overview%3Fcame_from%3Dstudy%26contentOption%3D%23All%20Classes_2"
       }
     ];
 
